@@ -166,7 +166,7 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
 /* Results */
 .results-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
 .count { font-size: 17px; color: var(--ink-soft); }
-.count strong { font-size: 26px; color: var(--ink); margin-right: 4px; }
+.count strong { color: var(--ink); }
 .bar-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .bar-actions select { padding: 8px 10px; border: 1px solid #CFCFCF; border-radius: 4px; background: #FFFFFF; }
 .switch { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
@@ -213,6 +213,52 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
 .empty { text-align: center; padding: 56px 24px; border-radius: var(--radius); background: var(--gray-light); }
 .empty h2 { margin: 0 0 6px; font-size: 20px; }
 .empty p { margin: 0 0 16px; color: var(--ink-soft); }
+
+/* Storefront grid */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; }
+.pcard { position: relative; display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: box-shadow .15s, transform .15s; }
+.pcard:hover { box-shadow: 0 10px 28px rgba(28,28,28,.10); transform: translateY(-2px); }
+.pcard.in-plan { border-color: var(--red-dark); box-shadow: 0 0 0 1px var(--red-dark); }
+.pcard-band { height: 6px; background: var(--accent); }
+.pcard-body { padding: 16px 18px 0; display: flex; flex-direction: column; flex: 1; }
+.pcard-meta { display: flex; flex-direction: column; gap: 1px; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.pcard-id { letter-spacing: .02em; }
+.pcard-sec { display: inline-flex; align-items: center; gap: 6px; }
+.pcard-sec i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+.pcard h3 { margin: 0 0 10px; font-size: 16px; line-height: 1.35; }
+.pcard-title { all: unset; cursor: pointer; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pcard-title:hover { color: var(--red-dark); text-decoration: underline; text-underline-offset: 3px; }
+.pcard-title:focus-visible { outline: 3px solid var(--blue-dark); outline-offset: 2px; border-radius: 2px; }
+.pcard .tags { margin-bottom: 10px; }
+.pcard-desc { margin: 0 0 8px; font-size: 13px; color: var(--ink-soft); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pcard-more { align-self: flex-start; margin-bottom: 14px; font-size: 13px; }
+.pcard-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 18px; background: var(--blue-2); }
+.price { line-height: 1.1; }
+.price strong { font-size: 24px; color: var(--red-dark); }
+.price span { display: block; font-size: 11px; color: var(--muted); }
+.price .scope { font-size: 14px; font-weight: 700; color: var(--blue-dark); }
+
+.pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin: 28px 0 8px; }
+.pager button { min-width: 40px; height: 40px; padding: 0 12px; border: 1px solid #D5D5D5; background: #FFFFFF; border-radius: 4px; cursor: pointer; }
+.pager button:hover:not(:disabled) { border-color: var(--red-dark); color: var(--red-dark); }
+.pager button[aria-current="page"] { background: var(--red-dark); border-color: var(--red-dark); color: #FFFFFF; font-weight: 700; }
+.pager button:disabled { opacity: .4; cursor: default; }
+.pager .gap { padding: 0 4px; color: var(--muted); }
+.pager-info { text-align: center; font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+
+/* Detail dialog */
+dialog.detail { width: min(720px, calc(100% - 32px)); max-height: calc(100vh - 48px); padding: 0; border: 0; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+dialog.detail::backdrop { background: rgba(28,28,28,.45); }
+.detail-band { height: 8px; background: var(--accent); }
+.detail-inner { padding: 24px 28px 8px; overflow-y: auto; }
+.detail-top { display: flex; align-items: flex-start; gap: 12px; }
+.detail-top .pcard-sec { font-size: 13px; color: var(--muted); }
+.detail-close { margin-left: auto; width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--gray-light); cursor: pointer; font-size: 20px; line-height: 1; flex: none; }
+.detail h2 { margin: 6px 0 10px; font-size: 24px; line-height: 1.25; }
+.detail-ids { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+.detail .desc { font-size: 15px; }
+.detail-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 28px; background: var(--blue-2); margin-top: 18px; }
+.detail-foot .price strong { font-size: 30px; }
 
 /* Plan drawer */
 .plan-fab { position: fixed; right: 24px; bottom: 24px; z-index: 20; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
@@ -362,13 +408,21 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
           <option value="name">Name, A to Z</option>
           <option value="id">ID, A to Z</option>
         </select>
-        <label class="switch"><input type="checkbox" id="group" checked> Group by section</label>
+        <label class="sr-only" for="per">Services per page</label>
+        <select id="per">
+          <option value="12">12 per page</option>
+          <option value="24" selected>24 per page</option>
+          <option value="48">48 per page</option>
+          <option value="96">96 per page</option>
+        </select>
         <button class="btn btn-ghost btn-sm" type="button" id="copy-link">Copy link</button>
         <button class="btn btn-ghost btn-sm" type="button" id="export">Download CSV</button>
       </div>
     </div>
     <div class="pills" id="pills"></div>
     <div id="results"></div>
+    <nav class="pager" id="pager" aria-label="Pages"></nav>
+    <p class="pager-info" id="pager-info"></p>
   </main>
 </div>
 
@@ -403,6 +457,7 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
     </div>
   </div>
 </aside>
+<dialog class="detail" id="detail" aria-labelledby="detail-title"></dialog>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="data.js"></script>
@@ -476,7 +531,8 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
   const TYPES = [...new Set(services.map((s) => s.type))];
 
   /* ---------- State ---------- */
-  const state = { q: "", leaves: new Set(), types: new Set(), min: "", max: "", scoping: "include", learner: "any", sort: "catalog", group: true, dedupe: false };
+  const state = { q: "", leaves: new Set(), types: new Set(), min: "", max: "", scoping: "include", learner: "any", sort: "catalog", dedupe: false, page: 1, per: 24 };
+  const PER_OPTIONS = [12, 24, 48, 96];
   const expanded = new Set();
   const plan = new Map();
 
@@ -546,7 +602,7 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
     $("min").value = state.min; $("max").value = state.max;
     document.querySelectorAll("[data-min]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.min === state.min && b.dataset.max === state.max && (state.min || state.max) ? "true" : "false"));
     $("scoping").value = state.scoping; $("learner").value = state.learner;
-    $("sort").value = state.sort; $("group").checked = state.group; $("dedupe").checked = state.dedupe;
+    $("sort").value = state.sort; $("per").value = String(state.per); $("dedupe").checked = state.dedupe;
   }
 
   /* ---------- Search ---------- */
@@ -610,52 +666,103 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
   }
 
   /* ---------- Rendering ---------- */
-  function card(s, showSection) {
-    const sec = SECTION[s.section], inPlan = plan.has(s.idx);
-    const long = s.desc.length > 260 || s.desc.split("\n").length > 3;
-    const tags = [
-      showSection ? `<span class="tag sec"><i style="background:${sec.color}"></i>${esc(sec.name)}</span>` : "",
+  function priceHtml(s) {
+    return s.scoping
+      ? `<span class="scope">Scoping Required</span>`
+      : `<strong>${s.credits.toLocaleString()}</strong><span>${s.perLearner ? "credits per learner" : "credits"}</span>`;
+  }
+  function tagsHtml(s, withDup) {
+    return [
       s.product !== GENERAL ? `<span class="tag product">${esc(s.product)}</span>` : "",
       `<span class="tag">${esc(s.type)}</span>`,
       s.perLearner ? `<span class="tag learner">Per learner</span>` : "",
-      s.others.length ? `<span class="tag dup">Also in ${esc(s.others.join(", "))}</span>` : ""
+      withDup && s.others.length ? `<span class="tag dup">Also in ${esc(s.others.join(", "))}</span>` : ""
     ].join("");
-    const credit = s.scoping
-      ? `<span class="credit-scope">Scoping Required</span>`
-      : `<span class="credit-num">${s.credits.toLocaleString()}</span><span class="credit-unit">${s.perLearner ? "credits per learner" : "credits"}</span>`;
-    return `<article class="svc${inPlan ? " in-plan" : ""}" data-card="${s.idx}">
-      <div>
-        <div class="svc-top"><span class="svc-id">${esc(s.id)}</span><span>Catalog page ${s.page}</span></div>
-        <h3>${esc(s.name)}</h3>
-        <div class="tags">${tags}</div>
-        <p class="desc${long ? " clamp" : ""}" id="d${s.idx}">${esc(s.desc)}</p>
-        ${long ? `<button type="button" class="link-btn" data-expand="${s.idx}" aria-expanded="false" aria-controls="d${s.idx}">Read full description</button>` : ""}
+  }
+  const addLabel = (on) => (on ? "Added" : "Add to plan");
+
+  function card(s) {
+    const sec = SECTION[s.section], on = plan.has(s.idx);
+    return `<article class="pcard${on ? " in-plan" : ""}" style="--accent:${sec.color}">
+      <div class="pcard-band"></div>
+      <div class="pcard-body">
+        <div class="pcard-meta"><span class="pcard-sec"><i></i>${esc(sec.name)}</span><span class="pcard-id">${esc(s.id)}</span></div>
+        <h3><button type="button" class="pcard-title" data-open="${s.idx}">${esc(s.name)}</button></h3>
+        <div class="tags">${tagsHtml(s, false)}</div>
+        <p class="pcard-desc">${esc(s.desc)}</p>
+        <button type="button" class="link-btn pcard-more" data-open="${s.idx}">View details<span class="sr-only"> for ${esc(s.name)}</span></button>
       </div>
-      <div class="svc-side">
-        <div class="credit-box">${credit}</div>
-        <button type="button" class="btn btn-ghost btn-sm add" data-add="${s.idx}" aria-pressed="${inPlan}">${inPlan ? "Added" : "Add to plan"}</button>
+      <div class="pcard-foot">
+        <div class="price">${priceHtml(s)}</div>
+        <button type="button" class="btn btn-sm ${on ? "btn-red" : "btn-ghost"}" data-add="${s.idx}" aria-pressed="${on}">${addLabel(on)}</button>
       </div>
     </article>`;
   }
 
-  function render() {
+  function pageList(cur, pages) {
+    const set = new Set([1, pages, cur - 1, cur, cur + 1]);
+    if (cur <= 3) [2, 3, 4].forEach((n) => set.add(n));
+    if (cur >= pages - 2) [pages - 1, pages - 2, pages - 3].forEach((n) => set.add(n));
+    const nums = [...set].filter((n) => n >= 1 && n <= pages).sort((x, y) => x - y);
+    const out = [];
+    nums.forEach((n, i) => { if (i && n - nums[i - 1] > 1) out.push("gap"); out.push(n); });
+    return out;
+  }
+
+  function render(resetPage = true) {
+    if (resetPage) state.page = 1;
     const list = filtered();
-    const total = state.dedupe ? Object.keys(byId).length : services.length;
-    $("count").innerHTML = `<strong>${list.length}</strong>of ${total} listings`;
-    if (!list.length) {
-      $("results").innerHTML = `<div class="empty"><h2>No services match</h2><p>Try fewer words or a wider credit range.</p><button class="btn btn-red btn-sm" type="button" data-action="reset">Clear all filters</button></div>`;
-    } else if (state.group) {
-      $("results").innerHTML = C.sections.map((sec) => {
-        const items = list.filter((s) => s.section === sec.key);
-        if (!items.length) return "";
-        return `<section class="sec-block" style="--accent:${sec.color};--tint:${tint(sec.color, 0.09)}">
-          <div class="sec-head"><span class="ring" aria-hidden="true"></span><div><h2>${esc(sec.name)}</h2><p>${esc(sec.tagline)}</p></div><span class="sec-count">${items.length} shown</span></div>
-          ${items.map((s) => card(s, false)).join("")}</section>`;
-      }).join("");
+    const pages = Math.max(1, Math.ceil(list.length / state.per));
+    state.page = Math.min(Math.max(1, state.page), pages);
+    const start = (state.page - 1) * state.per;
+    const slice = list.slice(start, start + state.per);
+
+    $("count").innerHTML = list.length
+      ? `Showing <strong>${start + 1}&ndash;${start + slice.length}</strong> of <strong>${list.length}</strong> listings`
+      : `<strong>0</strong> listings`;
+
+    $("results").innerHTML = list.length
+      ? `<div class="grid">${slice.map(card).join("")}</div>`
+      : `<div class="empty"><h2>No services match</h2><p>Try fewer words or a wider credit range.</p><button class="btn btn-red btn-sm" type="button" data-action="reset">Clear all filters</button></div>`;
+
+    if (pages > 1) {
+      $("pager").innerHTML =
+        `<button type="button" data-page="${state.page - 1}" ${state.page === 1 ? "disabled" : ""} aria-label="Previous page">&lsaquo; Prev</button>` +
+        pageList(state.page, pages).map((n) => n === "gap"
+          ? `<span class="gap" aria-hidden="true">&hellip;</span>`
+          : `<button type="button" data-page="${n}" ${n === state.page ? 'aria-current="page"' : ""} aria-label="Page ${n}">${n}</button>`).join("") +
+        `<button type="button" data-page="${state.page + 1}" ${state.page === pages ? "disabled" : ""} aria-label="Next page">Next &rsaquo;</button>`;
+      $("pager-info").textContent = `Page ${state.page} of ${pages}`;
     } else {
-      $("results").innerHTML = list.map((s) => card(s, true)).join("");
+      $("pager").innerHTML = ""; $("pager-info").textContent = "";
     }
     renderPills(); syncUrl();
+  }
+
+  function goToPage(n) {
+    state.page = n; render(false);
+    const top = document.querySelector("main").getBoundingClientRect().top + window.scrollY - 16;
+    window.scrollTo({ top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+
+  let detailIdx = null;
+  function openDetail(idx) {
+    const s = services[idx], sec = SECTION[s.section], on = plan.has(idx), dlg = $("detail");
+    detailIdx = idx;
+    dlg.style.setProperty("--accent", sec.color);
+    dlg.innerHTML = `<div class="detail-band"></div>
+      <div class="detail-inner">
+        <div class="detail-top"><span class="pcard-sec"><i></i>${esc(sec.name)}</span><button type="button" class="detail-close" data-close aria-label="Close">&times;</button></div>
+        <h2 id="detail-title">${esc(s.name)}</h2>
+        <p class="detail-ids">${esc(s.id)} | Catalog page ${s.page}</p>
+        <div class="tags">${tagsHtml(s, true)}</div>
+        <p class="desc">${esc(s.desc)}</p>
+      </div>
+      <div class="detail-foot">
+        <div class="price">${priceHtml(s)}</div>
+        <button type="button" class="btn ${on ? "btn-red" : "btn-ghost"}" data-add="${idx}" aria-pressed="${on}">${addLabel(on)}</button>
+      </div>`;
+    if (!dlg.open) dlg.showModal();
   }
 
   function renderPills() {
@@ -716,7 +823,8 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
     if (state.scoping !== "include") p.set("sc", state.scoping);
     if (state.learner !== "any") p.set("pl", state.learner);
     if (state.sort !== "catalog") p.set("sort", state.sort);
-    if (!state.group) p.set("grp", "0");
+    if (state.page > 1) p.set("p", state.page);
+    if (state.per !== 24) p.set("n", state.per);
     if (state.dedupe) p.set("dd", "1");
     const qs = p.toString();
     history.replaceState(null, "", qs ? "?" + qs : location.pathname);
@@ -730,7 +838,8 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
     state.scoping = ["include", "exclude", "only"].includes(p.get("sc")) ? p.get("sc") : "include";
     state.learner = ["any", "per", "flat"].includes(p.get("pl")) ? p.get("pl") : "any";
     state.sort = p.get("sort") || "catalog";
-    state.group = p.get("grp") !== "0";
+    state.per = PER_OPTIONS.includes(+p.get("n")) ? +p.get("n") : 24;
+    state.page = Math.max(1, parseInt(p.get("p"), 10) || 1);
     state.dedupe = p.get("dd") === "1";
   }
 
@@ -767,7 +876,7 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
       else if (el.id === "scoping") state.scoping = el.value;
       else if (el.id === "learner") state.learner = el.value;
       else if (el.id === "sort") state.sort = el.value;
-      else if (el.id === "group") state.group = el.checked;
+      else if (el.id === "per") state.per = +el.value;
       else if (el.id === "dedupe") state.dedupe = el.checked;
       else return;
       syncControls(); render();
@@ -779,10 +888,16 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
       if (d.twisty) {
         expanded.has(d.twisty) ? expanded.delete(d.twisty) : expanded.add(d.twisty);
         $("kids-" + d.twisty).hidden = !expanded.has(d.twisty); b.setAttribute("aria-expanded", expanded.has(d.twisty));
+      } else if (d.page !== undefined) {
+        goToPage(+d.page);
+      } else if (d.open !== undefined) {
+        openDetail(+d.open);
+      } else if (d.close !== undefined) {
+        $("detail").close();
       } else if (d.add !== undefined) {
         const i = +d.add; plan.has(i) ? plan.delete(i) : plan.set(i, 1);
-        const on = plan.has(i); b.setAttribute("aria-pressed", on); b.textContent = on ? "Added" : "Add to plan";
-        b.closest(".svc").classList.toggle("in-plan", on); renderPlan();
+        renderPlan(); render(false);
+        if ($("detail").open && detailIdx === i) openDetail(i);
       } else if (d.expand !== undefined) {
         const p = $("d" + d.expand), open = !p.classList.toggle("clamp");
         b.setAttribute("aria-expanded", open); b.textContent = open ? "Show less" : "Read full description";
@@ -799,7 +914,7 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
         else if (d.clear === "scoping") state.scoping = "include";
         else if (d.clear === "learner") state.learner = "any";
         syncControls(); render();
-      } else if (d.remove !== undefined) { plan.delete(+d.remove); renderPlan(); render(); }
+      } else if (d.remove !== undefined) { plan.delete(+d.remove); renderPlan(); render(false); }
       else if (d.action === "reset" || b.id === "reset") resetAll();
     });
 
@@ -818,10 +933,12 @@ select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-
     $("scrim").addEventListener("click", () => togglePlan(false));
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && $("plan").dataset.open === "true") togglePlan(false); });
     $("plan-copy").addEventListener("click", () => (plan.size ? copy(planText(), "Plan copied") : toast("Add a service first")));
-    $("plan-clear").addEventListener("click", () => { plan.clear(); renderPlan(); render(); });
+    $("plan-clear").addEventListener("click", () => { plan.clear(); renderPlan(); render(false); });
+    $("detail").addEventListener("click", (e) => { if (e.target === $("detail")) $("detail").close(); });
+    $("detail").addEventListener("close", () => { detailIdx = null; });
   }
 
-  renderStatic(); renderControls(); loadUrl(); syncControls(); bind(); render(); renderPlan();
+  renderStatic(); renderControls(); loadUrl(); syncControls(); bind(); render(false); renderPlan();
 })();
 </script>
 </body>
