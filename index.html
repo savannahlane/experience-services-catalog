@@ -125,15 +125,20 @@ details.tips summary { cursor: pointer; color: var(--red-dark); width: max-conte
 .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 40px; align-items: start; padding-top: 36px; padding-bottom: 40px; }
 @media (max-width: 960px) { .layout { grid-template-columns: 1fr; gap: 20px; } }
 
-/* Filters */
-.filters { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; padding: 4px 8px 4px 2px; scrollbar-width: thin; }
-@media (max-width: 960px) { .filters { position: static; max-height: none; } }
-.filter-toggle { display: none; }
-@media (max-width: 960px) {
-  .filter-toggle { display: flex; width: 100%; }
-  .filters[data-open="false"] .filter-panel { display: none; }
-  .filter-panel { margin-top: 14px; }
-}
+/* Filters drawer */
+.filters { position: fixed; top: 0; left: 0; height: 100vh; width: min(440px, 100%); background: #FFFFFF; z-index: 30; display: flex; flex-direction: column; transform: translateX(-100%); visibility: hidden; transition: transform .28s ease, visibility 0s linear .28s; box-shadow: 30px 0 80px rgba(0,0,0,.12); }
+.filters[data-open="true"] { transform: none; visibility: visible; transition: transform .28s ease; }
+.filters-head { display: flex; align-items: center; gap: 12px; padding: 28px 30px 20px; border-bottom: 1px solid var(--line); }
+.filters-head h2 { margin: 0; font-size: 26px; font-weight: 400; letter-spacing: -0.01em; }
+.filters-head .detail-close { margin-left: auto; }
+.filter-panel { flex: 1; overflow-y: auto; padding: 4px 30px 12px; scrollbar-width: thin; }
+.filters-foot { display: flex; gap: 12px; align-items: center; padding: 18px 30px 22px; border-top: 1px solid var(--line); background: #FFFFFF; }
+.filters-foot .btn-red { flex: 1; }
+.filters-btn { display: inline-flex; align-items: center; gap: 10px; }
+.filters-btn svg { width: 16px; height: 16px; }
+.badge { min-width: 22px; height: 22px; padding: 0 7px; border-radius: 999px; background: var(--ink); color: #FFFFFF; font-size: 12px; display: inline-grid; place-items: center; }
+.badge[hidden] { display: none; }
+.results-left { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
 .fgroup { padding: 18px 0; border-bottom: 1px solid var(--line); }
 .fgroup:first-child { padding-top: 0; }
 .fgroup h2 { font-size: 16px; margin: 0 0 10px; font-weight: 700; }
@@ -422,6 +427,11 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
 .plan-fab { border-radius: 999px; padding: 14px 26px; box-shadow: 0 18px 40px rgba(196,45,61,.28); }
 .scrim { background: rgba(28,28,28,.45); backdrop-filter: blur(2px); }
 
+/* Full-width results */
+.layout, .layout[class] { grid-template-columns: minmax(0, 1fr); gap: 0; }
+@media (max-width: 960px) { .layout { padding-top: 32px; } }
+.fgroup:first-child { padding-top: 24px; }
+
 /* Footer */
 .footer-grid { padding-block: 80px 120px; }
 .site-footer h2 { font-size: 36px; letter-spacing: -0.02em; color: var(--ink); }
@@ -482,8 +492,11 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
 </section>
 
 <div class="wrap layout">
-  <aside class="filters" id="filters" data-open="false" aria-label="Filters">
-    <button class="btn btn-ghost filter-toggle" id="filter-toggle" aria-expanded="false" aria-controls="filter-panel">Show filters</button>
+  <aside class="filters" id="filters" data-open="false" aria-labelledby="filters-title" aria-hidden="true">
+    <div class="filters-head">
+      <h2 id="filters-title">Filters</h2>
+      <button type="button" class="detail-close" id="filters-close" aria-label="Close filters">&times;</button>
+    </div>
     <div class="filter-panel" id="filter-panel">
       <div class="fgroup">
         <h2>Catalog section</h2>
@@ -502,14 +515,6 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
         <div class="presets" id="presets"></div>
       </div>
       <div class="fgroup">
-        <h2>Scoping Required services</h2>
-        <select class="full" id="scoping" aria-label="Scoping Required services">
-          <option value="include">Include</option>
-          <option value="exclude">Leave out</option>
-          <option value="only">Show only these</option>
-        </select>
-      </div>
-      <div class="fgroup">
         <h2>Pricing</h2>
         <select class="full" id="learner" aria-label="Pricing">
           <option value="any">Any</option>
@@ -521,18 +526,22 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
         <h2>Service type</h2>
         <div id="types"></div>
       </div>
-      <div class="fgroup">
-        <label class="check"><input type="checkbox" id="dedupe"> <span>Show services listed in two sections only once</span></label>
-      </div>
-      <div class="fgroup" style="border:0">
-        <button class="btn btn-ghost btn-sm" id="reset" type="button">Clear all filters</button>
-      </div>
+    </div>
+    <div class="filters-foot">
+      <button class="btn btn-ghost" id="reset" type="button">Clear all</button>
+      <button class="btn btn-red" id="filters-apply" type="button">Show results</button>
     </div>
   </aside>
 
   <main>
     <div class="results-bar">
-      <div class="count" aria-live="polite" id="count"></div>
+      <div class="results-left">
+        <button type="button" class="btn btn-ghost filters-btn" id="filters-open" aria-controls="filters" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+          Filters <span class="badge" id="filter-badge" hidden></span>
+        </button>
+        <div class="count" aria-live="polite" id="count"></div>
+      </div>
       <div class="bar-actions">
         <label class="sr-only" for="sort">Sort</label>
         <select id="sort">
@@ -540,7 +549,6 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
           <option value="credits-asc">Credits, low to high</option>
           <option value="credits-desc">Credits, high to low</option>
           <option value="name">Name, A to Z</option>
-          <option value="id">ID, A to Z</option>
         </select>
         <label class="sr-only" for="per">Services per page</label>
         <select id="per">
@@ -665,7 +673,7 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
   const TYPES = [...new Set(services.map((s) => s.type))];
 
   /* ---------- State ---------- */
-  const state = { q: "", leaves: new Set(), types: new Set(), min: "", max: "", scoping: "include", learner: "any", sort: "catalog", dedupe: false, page: 1, per: 24 };
+  const state = { q: "", leaves: new Set(), types: new Set(), min: "", max: "", learner: "any", sort: "catalog", page: 1, per: 24 };
   const PER_OPTIONS = [12, 24, 48, 96];
   const expanded = new Set();
   const plan = new Map();
@@ -735,8 +743,8 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
     document.querySelectorAll("[data-type]").forEach((el) => { el.checked = state.types.has(el.dataset.type); });
     $("min").value = state.min; $("max").value = state.max;
     document.querySelectorAll("[data-min]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.min === state.min && b.dataset.max === state.max && (state.min || state.max) ? "true" : "false"));
-    $("scoping").value = state.scoping; $("learner").value = state.learner;
-    $("sort").value = state.sort; $("per").value = String(state.per); $("dedupe").checked = state.dedupe;
+    $("learner").value = state.learner;
+    $("sort").value = state.sort; $("per").value = String(state.per);
   }
 
   /* ---------- Search ---------- */
@@ -779,22 +787,21 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
       if (state.types.size && !state.types.has(s.type)) return false;
       if (state.learner === "per" && !s.perLearner) return false;
       if (state.learner === "flat" && s.perLearner) return false;
-      if (s.scoping) { if (state.scoping === "exclude") return false; }
-      else {
-        if (state.scoping === "only") return false;
+      // Scoping Required services have no credit value and always stay in results.
+      if (!s.scoping) {
         if (min !== null && s.credits < min) return false;
         if (max !== null && s.credits > max) return false;
       }
       return terms.every((t) => (t.neg ? !match(s, t) : match(s, t)));
     });
-    if (state.dedupe) list = list.filter((s) => (seen.has(s.id) ? false : seen.add(s.id)));
+    // A service listed in two catalog sections appears once, at its first listing.
+    list = list.filter((s) => (seen.has(s.id) ? false : seen.add(s.id)));
     const cr = (s, hi) => (s.scoping ? (hi ? -1 : Infinity) : s.credits);
     const sorters = {
       catalog: (a, b) => a.idx - b.idx,
       "credits-asc": (a, b) => cr(a) - cr(b) || a.idx - b.idx,
       "credits-desc": (a, b) => cr(b, true) - cr(a, true) || a.idx - b.idx,
-      name: (a, b) => a.name.localeCompare(b.name),
-      id: (a, b) => a.id.localeCompare(b.id)
+      name: (a, b) => a.name.localeCompare(b.name)
     };
     return list.sort(sorters[state.sort] || sorters.catalog);
   }
@@ -861,8 +868,8 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
     const slice = list.slice(start, start + state.per);
 
     $("count").innerHTML = list.length
-      ? `Showing <strong>${start + 1}&ndash;${start + slice.length}</strong> of <strong>${list.length}</strong> listings`
-      : `<strong>0</strong> listings`;
+      ? `Showing <strong>${start + 1}&ndash;${start + slice.length}</strong> of <strong>${list.length}</strong> service${list.length === 1 ? "" : "s"}`
+      : `<strong>0</strong> services`;
 
     $("results").innerHTML = list.length
       ? `<div class="grid">${slice.map(card).join("")}</div>`
@@ -880,6 +887,10 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
       $("pager").innerHTML = ""; $("pager-info").textContent = "";
     }
     renderPills(); syncUrl();
+    const active = TREE.filter((t) => t.leaves.some((l) => state.leaves.has(l.key))).length + state.types.size +
+      (state.min !== "" || state.max !== "" ? 1 : 0) + (state.learner !== "any" ? 1 : 0);
+    $("filter-badge").hidden = !active; $("filter-badge").textContent = active;
+    $("filters-apply").textContent = list.length ? `Show ${list.length} service${list.length === 1 ? "" : "s"}` : "No matches";
   }
 
   function goToPage(n) {
@@ -919,7 +930,6 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
     });
     state.types.forEach((ty) => pills.push(["type", ty, ty]));
     if (state.min !== "" || state.max !== "") pills.push(["range", "", state.max === "" ? `${state.min}+ credits` : `${state.min || 0} to ${state.max} credits`]);
-    if (state.scoping !== "include") pills.push(["scoping", "", state.scoping === "only" ? "Scoping Required only" : "No Scoping Required"]);
     if (state.learner !== "any") pills.push(["learner", "", state.learner === "per" ? "Per learner" : "Not per learner"]);
     $("pills").innerHTML = pills.map(([g, v, l]) => `<button type="button" class="pill" data-clear="${g}" data-value="${esc(v)}">${esc(l)} <span aria-hidden="true">×</span><span class="sr-only">Remove</span></button>`).join("");
   }
@@ -950,6 +960,13 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
     const total = [...plan].reduce((a, [i, q]) => a + lineCredits(i, q), 0);
     return `${lines.join("\n")}\n\nTotal: ${total} credits\nSource: ${C.meta.title}, Version ${C.meta.version}`;
   }
+  function toggleFilters(open) {
+    const f = $("filters");
+    if ((f.dataset.open === "true") === open) return;
+    f.dataset.open = open; f.setAttribute("aria-hidden", String(!open)); $("scrim").dataset.open = open;
+    $("filters-open").setAttribute("aria-expanded", open);
+    if (open) setTimeout(() => $("filters-close").focus(), 50); else $("filters-open").focus();
+  }
   function togglePlan(open) {
     $("plan").dataset.open = open; $("scrim").dataset.open = open; $("plan").setAttribute("aria-hidden", String(!open));
     if (open) $("plan-close").focus(); else $("plan-open").focus();
@@ -963,12 +980,10 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
     if (state.types.size) p.set("ty", [...state.types].join("|"));
     if (state.min !== "") p.set("min", state.min);
     if (state.max !== "") p.set("max", state.max);
-    if (state.scoping !== "include") p.set("sc", state.scoping);
     if (state.learner !== "any") p.set("pl", state.learner);
     if (state.sort !== "catalog") p.set("sort", state.sort);
     if (state.page > 1) p.set("p", state.page);
     if (state.per !== 24) p.set("n", state.per);
-    if (state.dedupe) p.set("dd", "1");
     const qs = p.toString();
     history.replaceState(null, "", qs ? "?" + qs : location.pathname);
   }
@@ -978,17 +993,15 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
     (p.get("f") || "").split("|").filter((k) => ALL_LEAVES.has(k)).forEach((k) => state.leaves.add(k));
     (p.get("ty") || "").split("|").filter((t) => TYPES.includes(t)).forEach((t) => state.types.add(t));
     state.min = p.get("min") || ""; state.max = p.get("max") || "";
-    state.scoping = ["include", "exclude", "only"].includes(p.get("sc")) ? p.get("sc") : "include";
     state.learner = ["any", "per", "flat"].includes(p.get("pl")) ? p.get("pl") : "any";
-    state.sort = p.get("sort") || "catalog";
+    state.sort = ["catalog", "credits-asc", "credits-desc", "name"].includes(p.get("sort")) ? p.get("sort") : "catalog";
     state.per = PER_OPTIONS.includes(+p.get("n")) ? +p.get("n") : 24;
     state.page = Math.max(1, parseInt(p.get("p"), 10) || 1);
-    state.dedupe = p.get("dd") === "1";
   }
 
   /* ---------- Helpers ---------- */
   function resetAll() {
-    Object.assign(state, { q: "", min: "", max: "", scoping: "include", learner: "any", dedupe: false });
+    Object.assign(state, { q: "", min: "", max: "", learner: "any" });
     state.leaves.clear(); state.types.clear(); expanded.clear();
     syncControls(); render();
   }
@@ -1016,11 +1029,9 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
       } else if (d.leaf) { el.checked ? state.leaves.add(d.leaf) : state.leaves.delete(d.leaf); }
       else if (d.type) { el.checked ? state.types.add(d.type) : state.types.delete(d.type); }
       else if (d.qty) { plan.set(+d.qty, Math.max(1, parseInt(el.value, 10) || 1)); renderPlan(); return; }
-      else if (el.id === "scoping") state.scoping = el.value;
       else if (el.id === "learner") state.learner = el.value;
       else if (el.id === "sort") state.sort = el.value;
       else if (el.id === "per") state.per = +el.value;
-      else if (el.id === "dedupe") state.dedupe = el.checked;
       else return;
       syncControls(); render();
     });
@@ -1054,16 +1065,18 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
         else if (d.clear === "leaf") state.leaves.delete(v);
         else if (d.clear === "type") state.types.delete(v);
         else if (d.clear === "range") { state.min = ""; state.max = ""; }
-        else if (d.clear === "scoping") state.scoping = "include";
         else if (d.clear === "learner") state.learner = "any";
         syncControls(); render();
       } else if (d.remove !== undefined) { plan.delete(+d.remove); renderPlan(); render(false); }
       else if (d.action === "reset" || b.id === "reset") resetAll();
     });
 
-    $("filter-toggle").addEventListener("click", () => {
-      const f = $("filters"), open = f.dataset.open !== "true";
-      f.dataset.open = open; $("filter-toggle").setAttribute("aria-expanded", open); $("filter-toggle").textContent = open ? "Hide filters" : "Show filters";
+    $("filters-open").addEventListener("click", () => toggleFilters(true));
+    $("filters-close").addEventListener("click", () => toggleFilters(false));
+    $("filters-apply").addEventListener("click", () => {
+      toggleFilters(false);
+      const top = document.querySelector("main").getBoundingClientRect().top + window.scrollY - 16;
+      if (window.scrollY > top) window.scrollTo({ top });
     });
     $("copy-link").addEventListener("click", () => copy(location.href, "Link copied"));
     $("export").addEventListener("click", () => {
@@ -1073,8 +1086,12 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
     });
     $("plan-open").addEventListener("click", () => togglePlan(true));
     $("plan-close").addEventListener("click", () => togglePlan(false));
-    $("scrim").addEventListener("click", () => togglePlan(false));
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && $("plan").dataset.open === "true") togglePlan(false); });
+    $("scrim").addEventListener("click", () => { togglePlan(false); toggleFilters(false); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      if ($("plan").dataset.open === "true") togglePlan(false);
+      if ($("filters").dataset.open === "true") toggleFilters(false);
+    });
     $("plan-copy").addEventListener("click", () => (plan.size ? copy(planText(), "Plan copied") : toast("Add a service first")));
     $("plan-clear").addEventListener("click", () => { plan.clear(); renderPlan(); render(false); });
     $("detail").addEventListener("click", (e) => { if (e.target === $("detail")) $("detail").close(); });
