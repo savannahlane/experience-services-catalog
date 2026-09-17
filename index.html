@@ -429,6 +429,18 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
 .plan-fab { border-radius: 999px; padding: 14px 26px; box-shadow: 0 18px 40px rgba(196,45,61,.28); }
 .scrim { background: rgba(28,28,28,.45); backdrop-filter: blur(2px); }
 
+/* Filters button */
+.btn.filters-btn { border: 1.5px solid var(--ink); color: var(--ink); background: #FFFFFF; padding: 10px 20px; -webkit-text-stroke: 0.25px currentColor; }
+.btn.filters-btn:hover { background: #F4F4F4; border-color: var(--ink); }
+.bar-actions select { height: 40px; }
+
+/* Clickable stat */
+button.stat { all: unset; box-sizing: border-box; cursor: pointer; background: #FFFFFF; border-radius: 14px; box-shadow: 0 24px 60px rgba(28,28,28,.08); overflow: hidden; min-width: 270px; transition: box-shadow .2s, transform .2s; text-align: left; }
+button.stat:hover { box-shadow: 0 28px 70px rgba(28,28,28,.14); transform: translateY(-2px); }
+button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset: 3px; }
+.stat-go { display: block; font-size: 13px; color: var(--red-dark); margin-top: 4px; letter-spacing: .02em; }
+@media (max-width: 980px) { button.stat { min-width: 0; } }
+
 /* Full-width results */
 .layout, .layout[class] { grid-template-columns: minmax(0, 1fr); gap: 0; }
 @media (max-width: 960px) { .layout { padding-top: 32px; } }
@@ -460,11 +472,12 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
       <div class="search" role="search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
         <label for="q" class="sr-only">Search services</label>
-        <input id="q" type="search" autocomplete="off" placeholder="Search by service, ID, description, or credits">
+        <input id="q" type="search" autocomplete="off" placeholder="Describe what you need, or search by name or ID">
       </div>
       <details class="tips">
         <summary>Search tips</summary>
         <div class="tips-grid">
+          <code>our clerks need help with agendas</code><span>Describe a need in plain words; best matches come first</span>
           <code>"platform review"</code><span>Match an exact phrase</span>
           <code>credits:&lt;=25</code><span>25 credits or fewer (also &lt;, &gt;, &gt;=)</span>
           <code>credits:10-50</code><span>Between 10 and 50 credits</span>
@@ -539,7 +552,7 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
     <div class="results-bar">
       <div class="results-left">
         <button type="button" class="btn btn-ghost filters-btn" id="filters-open" aria-controls="filters" aria-expanded="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
           Filters <span class="badge" id="filter-badge" hidden></span>
         </button>
         <div class="count" aria-live="polite" id="count"></div>
@@ -547,7 +560,7 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
       <div class="bar-actions">
         <label class="sr-only" for="sort">Sort</label>
         <select id="sort">
-          <option value="catalog">Catalog order</option>
+          <option value="catalog">Recommended</option>
           <option value="credits-asc">Credits, low to high</option>
           <option value="credits-desc">Credits, high to low</option>
           <option value="name">Name, A to Z</option>
@@ -605,6 +618,7 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
 <div class="toast" id="toast" role="status"></div>
 
 <script src="data.js"></script>
+<script src="search-terms.js"></script>
 <script>
 (function () {
   "use strict";
@@ -701,7 +715,9 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
       ["Across every solution", `<strong>${ALL_LEAVES.size}</strong> capabilities`],
       ["Fit any credit balance", `<strong>${Math.min(...priced)}</strong> to <strong>${Math.max(...priced).toLocaleString()}</strong> credits`]
     ];
-    $("stats").innerHTML = stats.map(([h, b]) => `<div class="stat"><div class="stat-head">${h}</div><div class="stat-body">${b}</div></div>`).join("");
+    $("stats").innerHTML = stats.map(([h, b], i) => i === 0
+      ? `<button type="button" class="stat" id="browse-all"><span class="stat-head" style="display:block">${h}</span><span class="stat-body" style="display:block">${b}<span class="stat-go">View everything &rarr;</span></span></button>`
+      : `<div class="stat"><div class="stat-head">${h}</div><div class="stat-body">${b}</div></div>`).join("");
 
     const g = m.gettingStarted;
     const icons = [
@@ -750,14 +766,95 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
   }
 
   /* ---------- Search ---------- */
+  // Plain words are ranked by relevance; quotes, field:value terms, and -exclusions stay strict filters.
+  const TERMS = window.SEARCH_TERMS || { ignore: [], related: [] };
+  const norm = (t) => t.toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9&]+/g, " ").trim();
+  function stem(w) {
+    if (w.length > 4) {
+      if (w.endsWith("ies")) w = w.slice(0, -3) + "y";
+      else for (const suf of ["ing", "ed", "es", "s"]) { if (w.endsWith(suf) && w.length - suf.length >= 3) { w = w.slice(0, -suf.length); break; } }
+      if (w.length > 4 && w.endsWith("e")) w = w.slice(0, -1);
+    }
+    return w;
+  }
+  const tokens = (t) => norm(t).split(" ").filter(Boolean).map(stem);
+  const IGNORE = new Set(TERMS.ignore.map((w) => stem(norm(w))));
+  const GROUPS = TERMS.related.map((g) => g.map((term) => {
+    const n = norm(term);
+    return n.includes(" ") ? { phrase: n } : { word: stem(n) };
+  }));
+  const sameWord = (q, d) => {
+    if (q === d) return true;
+    const [sh, lo] = q.length <= d.length ? [q, d] : [d, q];
+    return sh.length >= 5 && lo.startsWith(sh);
+  };
+
+  services.forEach((s) => {
+    s.fields = [
+      { w: 6, text: norm(s.name) },
+      { w: 4, text: norm([s.product, SECTION[s.section].name, s.type, LEGACY[s.product] || ""].join(" ")) },
+      { w: 4, text: norm(s.id) },
+      { w: 2, text: norm(s.desc) }
+    ].map((f) => ({ ...f, toks: [...new Set(f.text.split(" ").map(stem))], padded: " " + f.text + " " }));
+  });
+
+  function termWeight(s, term) {
+    let best = 0;
+    for (const f of s.fields) {
+      if (f.w <= best) continue;
+      const hit = term.phrase ? f.padded.includes(" " + term.phrase + " ") : f.toks.some((d) => sameWord(term.word, d));
+      if (hit) best = f.w;
+    }
+    return best;
+  }
+
+  function buildConcepts(freeText) {
+    const text = norm(freeText);
+    if (!text) return [];
+    const words = text.split(" ").map(stem).filter((w) => w && !IGNORE.has(w));
+    const concepts = words.map((w) => ({ label: w, primary: [{ word: w }], related: [] }));
+    GROUPS.forEach((group) => {
+      const phraseHit = group.find((t) => t.phrase && (" " + text + " ").includes(" " + t.phrase + " "));
+      if (phraseHit) {
+        concepts.push({ label: phraseHit.phrase, primary: [phraseHit], related: group.filter((t) => t !== phraseHit) });
+        return;
+      }
+      concepts.forEach((c) => {
+        if (group.some((t) => t.word && t.word === c.label)) {
+          group.forEach((t) => { if (!(t.word && t.word === c.label)) c.related.push(t); });
+        }
+      });
+    });
+    return concepts;
+  }
+
+  function scoreService(s, concepts, rawText) {
+    let score = 0, matched = 0;
+    concepts.forEach((c) => {
+      const direct = Math.max(0, ...c.primary.map((t) => termWeight(s, t)));
+      const rel = direct ? 0 : Math.max(0, ...c.related.map((t) => termWeight(s, t))) * 0.55;
+      if (direct || rel) matched++;
+      score += direct || rel;
+    });
+    if (!matched) return 0;
+    score += Math.pow(matched / concepts.length, 2) * 10;
+    const whole = norm(rawText);
+    if (whole.length > 5 && s.fields[0].padded.includes(" " + whole + " ")) score += 12;
+    return score;
+  }
+
   function parseQuery(q) {
-    const out = [], re = /(-?)(?:(\w+):)?(?:"([^"]*)"|(\S+))/g;
+    const strict = [], free = [], re = /(-?)(?:(\w+):)?(?:"([^"]*)"|(\S+))/g;
     let m;
     while ((m = re.exec(q)) !== null) {
-      const v = (m[3] !== undefined ? m[3] : m[4] || "").trim().toLowerCase();
-      if (v) out.push({ neg: m[1] === "-", field: m[2] ? m[2].toLowerCase() : null, v });
+      const quoted = m[3] !== undefined;
+      const v = (quoted ? m[3] : m[4] || "").trim().toLowerCase();
+      if (!v) continue;
+      const neg = m[1] === "-", field = m[2] ? m[2].toLowerCase() : null;
+      if (neg || field || quoted) strict.push({ neg, field, v });
+      else free.push(v);
     }
-    return out;
+    return { strict, freeText: free.join(" ") };
   }
   function creditTest(e) {
     let m;
@@ -781,7 +878,9 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
   }
 
   function filtered() {
-    const terms = parseQuery(state.q);
+    const { strict, freeText } = parseQuery(state.q);
+    const concepts = buildConcepts(freeText);
+    const scores = new Map();
     const min = state.min === "" ? null : +state.min, max = state.max === "" ? null : +state.max;
     const seen = new Set();
     let list = services.filter((s) => {
@@ -798,8 +897,20 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
         if (min !== null && s.credits < min) return false;
         if (max !== null && s.credits > max) return false;
       }
-      return terms.every((t) => (t.neg ? !match(s, t) : match(s, t)));
+      if (!strict.every((t) => (t.neg ? !match(s, t) : match(s, t)))) return false;
+      if (concepts.length) {
+        const sc = scoreService(s, concepts, freeText);
+        if (!sc) return false;
+        scores.set(s.idx, sc);
+      }
+      return true;
     });
+    if (concepts.length && list.length) {
+      // Keep the strongest matches so a descriptive search stays focused.
+      const top = Math.max(...list.map((s) => scores.get(s.idx)));
+      const floor = concepts.length > 1 ? top * 0.45 : 0;
+      list = list.filter((s) => scores.get(s.idx) >= floor);
+    }
     // A service listed in two catalog sections appears once, at its first listing.
     list = list.filter((s) => (seen.has(s.id) ? false : seen.add(s.id)));
     const cr = (s, hi) => (s.scoping ? (hi ? -1 : Infinity) : s.credits);
@@ -809,6 +920,9 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
       "credits-desc": (a, b) => cr(b, true) - cr(a, true) || a.idx - b.idx,
       name: (a, b) => a.name.localeCompare(b.name)
     };
+    if (concepts.length && state.sort === "catalog") {
+      return list.sort((a, b) => scores.get(b.idx) - scores.get(a.idx) || a.idx - b.idx);
+    }
     return list.sort(sorters[state.sort] || sorters.catalog);
   }
 
@@ -1078,6 +1192,12 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
     });
 
     $("filters-open").addEventListener("click", () => toggleFilters(true));
+    $("browse-all").addEventListener("click", () => {
+      state.sort = "catalog";
+      resetAll();
+      const top = document.querySelector("main").getBoundingClientRect().top + window.scrollY - 16;
+      window.scrollTo({ top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    });
     $("filters-close").addEventListener("click", () => toggleFilters(false));
     $("filters-apply").addEventListener("click", () => {
       toggleFilters(false);
