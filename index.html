@@ -840,7 +840,7 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
     ].filter(Boolean).join(" | ");
     return `<article class="pcard${on ? " in-plan" : ""}" style="--accent:${sec.color}">
       <div class="pcard-body">
-        <div class="pcard-meta"><span class="pcard-sec"><i></i>${esc(sec.name)}</span><span class="pcard-id">${esc(s.id)}</span></div>
+        <div class="pcard-meta"><span class="pcard-sec"><i></i>${esc(sec.name.replace(/ Services$/, ""))}</span><span class="pcard-id">${esc(s.id)}</span></div>
         <h3><button type="button" class="pcard-title" data-open="${s.idx}">${esc(s.name)}</button></h3>
         <p class="pcard-type">${typeLine}</p>
         <p class="pcard-desc">${esc(s.desc)}</p>
