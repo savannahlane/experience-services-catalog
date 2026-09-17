@@ -362,7 +362,9 @@ details.tips summary { color: var(--muted); letter-spacing: .02em; }
 .pill span[aria-hidden] { background: var(--gray-light); }
 
 /* Cards */
-.grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px; }
+.grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+@media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; } }
+@media (max-width: 640px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 .pcard { border-color: var(--line); border-radius: var(--radius); transition: box-shadow .25s ease, border-color .25s ease; }
 .pcard:hover { transform: none; border-color: #E0E0E0; box-shadow: 0 28px 60px rgba(28,28,28,.08); }
 .pcard.in-plan { border-color: var(--red-dark); box-shadow: 0 0 0 1px var(--red-dark), 0 20px 50px rgba(196,45,61,.08); }
@@ -695,8 +697,8 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
 
     const priced = services.filter((s) => !s.scoping).map((s) => s.credits);
     const stats = [
-      ["Browse the catalog", `<strong>${Object.keys(byId).length}</strong> services`],
-      ["Across every solution", `<strong>${C.sections.length}</strong> catalog sections`],
+      ["Browse the catalog", `<strong>${services.length}</strong> services`],
+      ["Across every solution", `<strong>${ALL_LEAVES.size}</strong> capabilities`],
       ["Fit any credit balance", `<strong>${Math.min(...priced)}</strong> to <strong>${Math.max(...priced).toLocaleString()}</strong> credits`]
     ];
     $("stats").innerHTML = stats.map(([h, b]) => `<div class="stat"><div class="stat-head">${h}</div><div class="stat-body">${b}</div></div>`).join("");
@@ -787,8 +789,12 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
       if (state.types.size && !state.types.has(s.type)) return false;
       if (state.learner === "per" && !s.perLearner) return false;
       if (state.learner === "flat" && s.perLearner) return false;
-      // Scoping Required services have no credit value and always stay in results.
-      if (!s.scoping) {
+            if (s.scoping) {
+        // Scoping Required services show with no credit filter, when the minimum is above 10,
+        // or when the maximum is 50 or more.
+        const noRange = min === null && max === null;
+        if (!(noRange || (min !== null && min > 10) || (max !== null && max >= 50))) return false;
+      } else {
         if (min !== null && s.credits < min) return false;
         if (max !== null && s.credits > max) return false;
       }
