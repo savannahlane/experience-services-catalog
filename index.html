@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experience Services Catalog | Government Experience Cloud</title>
+<style>
+:root {
+  --granicus-red: #D41F37;
+  --granicus-coral: #EF6A57;
+  --granicus-dark-red: #C42D3D;
+  --granicus-light-gray: #EEEEEE;
+  --granicus-near-black: #1C1C1C;
+  --granicus-blue: #3879AF;
+  --granicus-dark-blue: #38668A;
+  --granicus-green: #4CA382;
+  --granicus-dark-green: #4C7960;
+  --text-muted: #555555;
+  --line: #DDDDDD;
+  --surface: #FFFFFF;
+  --font: "Sofia Pro", "Century Gothic", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--granicus-near-black);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+}
+a { color: var(--granicus-dark-red); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--granicus-dark-blue); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Header */
+.site-header { border-bottom: 1px solid var(--line); background: var(--surface); }
+.header-inner { max-width: 1320px; margin: 0 auto; padding: 20px 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.logo { height: 36px; width: auto; display: block; }
+.header-text { display: flex; flex-direction: column; }
+.header-text .kicker { color: var(--granicus-dark-red); font-size: 14px; }
+.header-text h1 { margin: 0; font-size: 26px; font-weight: 700; line-height: 1.2; }
+.header-meta { margin-left: auto; color: var(--text-muted); font-size: 13px; text-align: right; }
+
+/* Hero: search is the main job */
+.hero { background: var(--granicus-light-gray); }
+.hero-inner { max-width: 1320px; margin: 0 auto; padding: 28px 24px 24px; }
+.hero p.intro { margin: 0 0 16px; max-width: 70ch; }
+.search-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: stretch; }
+.search-box { flex: 1 1 420px; position: relative; }
+.search-box input {
+  width: 100%; padding: 14px 16px; font-size: 17px;
+  border: 2px solid #BBBBBB; border-radius: 6px; background: #FFFFFF;
+}
+.search-box input:focus { border-color: var(--granicus-dark-blue); outline: none; }
+.search-help { font-size: 13px; color: var(--text-muted); margin: 8px 0 0; }
+.search-help code { background: #FFFFFF; border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; font-size: 12px; }
+details.getting-started { margin-top: 16px; }
+details.getting-started summary { cursor: pointer; color: var(--granicus-dark-red); }
+.gs-body { margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; max-width: 900px; }
+.gs-body p { margin: 0 0 8px; }
+.gs-option { background: #FFFFFF; border-radius: 6px; padding: 12px 14px; }
+.gs-option strong { display: block; }
+
+/* Layout */
+.layout { max-width: 1320px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 290px 1fr; gap: 32px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+/* Filters */
+.filters { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 6px; }
+@media (max-width: 900px) { .filters { position: static; max-height: none; } }
+.filter-toggle { display: none; }
+@media (max-width: 900px) {
+  .filter-toggle { display: block; width: 100%; padding: 10px; border: 1px solid var(--line); background: #FFFFFF; border-radius: 6px; cursor: pointer; margin-bottom: 12px; }
+  .filters[data-open="false"] .filter-groups { display: none; }
+}
+.filter-group { border-top: 1px solid var(--line); padding: 14px 0; }
+.filter-group:first-child { border-top: 0; padding-top: 0; }
+.filter-group h2 { font-size: 15px; margin: 0 0 8px; font-weight: 700; }
+.filter-group .hint { font-size: 12px; color: var(--text-muted); margin: 0 0 8px; }
+.check { display: flex; align-items: flex-start; gap: 8px; padding: 3px 0; cursor: pointer; font-size: 14px; }
+.check input { margin-top: 4px; accent-color: var(--granicus-dark-red); }
+.check .count { margin-left: auto; color: var(--text-muted); font-size: 12px; padding-left: 8px; }
+.swatch { width: 4px; align-self: stretch; border-radius: 2px; flex: none; }
+.edition-group-label { font-size: 12px; color: var(--text-muted); margin: 10px 0 2px; }
+.range { display: flex; gap: 8px; align-items: center; }
+.range input { width: 100%; padding: 8px; border: 1px solid #BBBBBB; border-radius: 4px; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip-btn { border: 1px solid var(--line); background: #FFFFFF; border-radius: 999px; padding: 3px 10px; font-size: 13px; cursor: pointer; }
+.chip-btn:hover { border-color: var(--granicus-dark-blue); }
+select.full { width: 100%; padding: 8px; border: 1px solid #BBBBBB; border-radius: 4px; background: #FFFFFF; }
+.link-btn { background: none; border: 0; padding: 0; color: var(--granicus-dark-red); cursor: pointer; text-decoration: underline; font-size: 13px; }
+
+/* Results */
+.results-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.results-count { font-size: 18px; }
+.results-count strong { font-size: 22px; }
+.bar-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.bar-actions select { padding: 7px; border: 1px solid #BBBBBB; border-radius: 4px; background: #FFFFFF; }
+.btn { border: 1px solid var(--granicus-dark-red); color: var(--granicus-dark-red); background: #FFFFFF; border-radius: 4px; padding: 7px 12px; cursor: pointer; font-size: 14px; }
+.btn:hover { background: #FBEFF1; }
+.btn.primary { background: var(--granicus-dark-red); color: #FFFFFF; }
+.btn.primary:hover { background: #A92534; }
+.active-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.active-filters:empty { display: none; }
+.pill { background: var(--granicus-light-gray); border: 0; border-radius: 999px; padding: 3px 10px; font-size: 13px; cursor: pointer; }
+.pill::after { content: " ×"; }
+
+.section-block { margin-bottom: 28px; }
+.section-head { border-left: 6px solid var(--accent); padding: 2px 0 2px 14px; margin: 0 0 12px; }
+.section-head h2 { margin: 0; font-size: 20px; }
+.section-head p { margin: 2px 0 0; color: var(--text-muted); font-size: 14px; max-width: 80ch; }
+
+table.svc { width: 100%; border-collapse: collapse; }
+table.svc th { text-align: left; font-size: 13px; font-weight: 700; color: var(--granicus-near-black); background: var(--granicus-light-gray); padding: 8px 10px; }
+table.svc td { padding: 12px 10px; vertical-align: top; border-bottom: 1px solid var(--line); }
+table.svc tr.in-plan td { background: #FBF4F5; }
+.col-id { width: 150px; font-size: 12px; color: var(--text-muted); word-break: break-word; }
+.col-credits { width: 96px; text-align: right; }
+.col-add { width: 92px; text-align: right; }
+.svc-name { font-weight: 700; margin: 0 0 4px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }
+.tag { font-size: 12px; border: 1px solid var(--line); border-radius: 3px; padding: 0 6px; color: var(--text-muted); background: #FFFFFF; }
+.tag.edition { color: var(--granicus-dark-blue); border-color: #C8D6E3; }
+.tag.learner { color: var(--granicus-dark-green); border-color: #C6DACD; }
+.tag.dup { color: var(--granicus-dark-red); border-color: #EBC7CC; }
+.desc { white-space: pre-line; margin: 0; font-size: 14px; color: #333333; max-width: 85ch; }
+.desc.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.credits-num { font-size: 22px; font-weight: 700; color: var(--granicus-dark-red); line-height: 1.1; }
+.credits-unit { display: block; font-size: 12px; color: var(--text-muted); }
+.credits-scope { font-size: 13px; font-weight: 700; color: var(--granicus-dark-blue); }
+.add-btn { border: 1px solid var(--granicus-dark-red); background: #FFFFFF; color: var(--granicus-dark-red); border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 13px; }
+.add-btn[aria-pressed="true"] { background: var(--granicus-dark-red); color: #FFFFFF; }
+.page-ref { font-size: 12px; color: var(--text-muted); }
+
+@media (max-width: 720px) {
+  table.svc thead { display: none; }
+  table.svc, table.svc tbody, table.svc tr, table.svc td { display: block; width: 100%; }
+  table.svc tr { border-bottom: 1px solid var(--line); padding: 10px 0; }
+  table.svc td { border: 0; padding: 4px 0; text-align: left; }
+  .col-id, .col-credits, .col-add { width: auto; text-align: left; }
+}
+
+.empty { padding: 40px 24px; text-align: center; background: var(--granicus-light-gray); border-radius: 6px; }
+.empty p { margin: 0 0 12px; }
+
+/* Plan drawer */
+.plan-fab { position: fixed; right: 20px; bottom: 20px; z-index: 20; box-shadow: 0 2px 8px rgba(0,0,0,.18); border-radius: 999px; padding: 12px 18px; }
+.plan { position: fixed; top: 0; right: 0; height: 100vh; width: min(440px, 100%); background: #FFFFFF; border-left: 1px solid var(--line); z-index: 30; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .2s ease; }
+@media (prefers-reduced-motion: reduce) { .plan { transition: none; } }
+.plan[data-open="true"] { transform: translateX(0); }
+.plan-head { padding: 18px 20px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
+.plan-head h2 { margin: 0; font-size: 20px; }
+.plan-head .btn { margin-left: auto; }
+.plan-body { padding: 12px 20px; overflow-y: auto; flex: 1; }
+.plan-item { border-bottom: 1px solid var(--line); padding: 10px 0; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; }
+.plan-item .pi-name { font-weight: 700; font-size: 14px; }
+.plan-item .pi-id { font-size: 12px; color: var(--text-muted); }
+.plan-item .pi-controls { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.plan-item input[type=number] { width: 64px; padding: 4px; border: 1px solid #BBBBBB; border-radius: 4px; }
+.plan-item .pi-sub { text-align: right; font-weight: 700; }
+.plan-foot { border-top: 1px solid var(--line); padding: 16px 20px; background: var(--granicus-light-gray); }
+.plan-total { display: flex; justify-content: space-between; align-items: baseline; font-size: 18px; margin-bottom: 4px; }
+.plan-total strong { font-size: 26px; color: var(--granicus-dark-red); }
+.plan-note { font-size: 12px; color: var(--text-muted); margin: 0 0 12px; }
+.plan-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.scrim { position: fixed; inset: 0; background: rgba(28,28,28,.35); z-index: 25; display: none; }
+.scrim[data-open="true"] { display: block; }
+
+/* Footer */
+.site-footer { background: var(--granicus-light-gray); margin-top: 24px; }
+.footer-inner { max-width: 1320px; margin: 0 auto; padding: 28px 24px 90px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 720px) { .footer-inner { grid-template-columns: 1fr; } }
+.site-footer h2 { margin: 0 0 6px; font-size: 20px; }
+.site-footer p { margin: 0 0 8px; max-width: 70ch; }
+.fine { font-size: 12px; color: var(--text-muted); }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--granicus-near-black); color: #FFFFFF; padding: 8px 14px; border-radius: 4px; font-size: 14px; z-index: 40; display: none; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <!-- Place the approved horizontal logo at assets/Granicus_Horizontal_OnWhite.png (see README). Hidden until the file exists. -->
+    <img class="logo" src="assets/Granicus_Horizontal_OnWhite.png" alt="Granicus" onerror="this.remove()">
+    <div class="header-text">
+      <span class="kicker" id="kicker"></span>
+      <h1 id="page-title"></h1>
+    </div>
+    <div class="header-meta" id="header-meta"></div>
+  </div>
+</header>
+
+<section class="hero" aria-label="Search the catalog">
+  <div class="hero-inner">
+    <p class="intro" id="intro"></p>
+    <div class="search-row">
+      <div class="search-box">
+        <label for="q" class="sr-only">Search services</label>
+        <input id="q" type="search" autocomplete="off" placeholder="Search by name, ID, description, product, or credits">
+      </div>
+    </div>
+    <p class="search-help">
+      Words must all match. Use quotes for a phrase: <code>"platform review"</code>.
+      Target a field: <code>credits:&lt;=25</code> <code>credits:10-50</code> <code>type:agency</code> <code>id:SC-</code> <code>product:legistar</code> <code>page:33</code>.
+      Exclude a word with a minus: <code>-french</code>.
+    </p>
+    <details class="getting-started">
+      <summary>How the catalog works</summary>
+      <div class="gs-body" id="getting-started"></div>
+    </details>
+  </div>
+</section>
+
+<div class="layout">
+  <aside class="filters" id="filters" data-open="false" aria-label="Filters">
+    <button class="filter-toggle" id="filter-toggle" aria-expanded="false" aria-controls="filter-groups">Show filters</button>
+    <div class="filter-groups" id="filter-groups">
+      <div class="filter-group">
+        <h2>Products you have</h2>
+        <p class="hint">Pick the editions an agency owns. Cross-product services for that area are included unless you turn that off.</p>
+        <label class="check"><input type="checkbox" id="include-general" checked> <span>Include general services for the selected products' areas</span></label>
+        <div id="edition-filters"></div>
+      </div>
+      <div class="filter-group">
+        <h2>Catalog section</h2>
+        <div id="section-filters"></div>
+      </div>
+      <div class="filter-group">
+        <h2>Credits</h2>
+        <div class="range">
+          <label class="sr-only" for="min">Minimum credits</label>
+          <input id="min" type="number" min="0" inputmode="numeric" placeholder="Min">
+          <span aria-hidden="true">to</span>
+          <label class="sr-only" for="max">Maximum credits</label>
+          <input id="max" type="number" min="0" inputmode="numeric" placeholder="Max">
+        </div>
+        <div class="presets" id="presets"></div>
+        <p class="hint" style="margin-top:10px">Scoping Required services</p>
+        <select class="full" id="scoping" aria-label="Scoping Required services">
+          <option value="include">Include</option>
+          <option value="exclude">Exclude</option>
+          <option value="only">Show only these</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <h2>Pricing basis</h2>
+        <select class="full" id="learner" aria-label="Pricing basis">
+          <option value="any">Any</option>
+          <option value="per">Per learner only</option>
+          <option value="flat">Not per learner</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <h2>Service type</h2>
+        <div id="type-filters"></div>
+      </div>
+      <div class="filter-group">
+        <label class="check"><input type="checkbox" id="dedupe"> <span>Show services listed in more than one section only once</span></label>
+      </div>
+      <div class="filter-group">
+        <button class="btn" id="reset" type="button">Clear all filters</button>
+      </div>
+    </div>
+  </aside>
+
+  <main id="main">
+    <div class="results-bar">
+      <div class="results-count" aria-live="polite" id="count"></div>
+      <div class="bar-actions">
+        <label for="sort" class="sr-only">Sort</label>
+        <select id="sort">
+          <option value="catalog">Catalog order</option>
+          <option value="credits-asc">Credits, low to high</option>
+          <option value="credits-desc">Credits, high to low</option>
+          <option value="name">Name, A to Z</option>
+          <option value="id">ID, A to Z</option>
+        </select>
+        <label class="check" style="padding:0"><input type="checkbox" id="group" checked> <span>Group by section</span></label>
+        <button class="btn" type="button" id="copy-link">Copy link to this view</button>
+        <button class="btn" type="button" id="export">Download CSV</button>
+      </div>
+    </div>
+    <div class="active-filters" id="active-filters"></div>
+    <div id="results"></div>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <h2 id="contact-heading"></h2>
+      <p id="contact-text"></p>
+      <p><a id="contact-email" href="#"></a></p>
+    </div>
+    <div>
+      <p class="fine" id="source-note"></p>
+      <p class="fine">Internal reference tool. Service names, descriptions, and credit values are reproduced from the catalog as published. Confirm availability and scope with the Experience Partner before committing credits.</p>
+    </div>
+  </div>
+</footer>
+
+<button class="btn primary plan-fab" id="plan-open" type="button" aria-controls="plan">Credit plan (0)</button>
+<div class="scrim" id="scrim"></div>
+<aside class="plan" id="plan" data-open="false" aria-label="Credit plan" aria-hidden="true">
+  <div class="plan-head">
+    <h2>Credit plan</h2>
+    <button class="btn" type="button" id="plan-close">Close</button>
+  </div>
+  <div class="plan-body" id="plan-body"></div>
+  <div class="plan-foot">
+    <div class="plan-total"><span>Total credits</span><strong id="plan-total">0</strong></div>
+    <p class="plan-note" id="plan-note"></p>
+    <div class="plan-actions">
+      <button class="btn primary" type="button" id="plan-copy">Copy plan as text</button>
+      <button class="btn" type="button" id="plan-clear">Clear plan</button>
+    </div>
+  </div>
+</aside>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  "use strict";
+  const C = window.CATALOG;
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  /* ---------- Derived fields (rules documented in README) ---------- */
+  const SECTION = Object.fromEntries(C.sections.map((s) => [s.key, s]));
+
+  function editionOf(id, name) {
+    if (/PCL Enterprise/.test(name)) return "PCL Enterprise";
+    if (/PCL Enhanced/.test(name)) return "PCL Enhanced";
+    if (/^RRM Enhanced/.test(name)) return "RRM Enhanced";
+    if (/^RRM Essentials/.test(name)) return "RRM Essentials";
+    if (/^Agenda LE/.test(name)) return "Agenda LE";
+    if (/^Agenda OE/.test(name)) return "Agenda OE";
+    if (/^Agenda PE/.test(name)) return "Agenda PE";
+    const prefix = id.split("-")[0];
+    const map = {
+      CMSO: "CMS OE", CMSV: "CMS VE", STFE: "Sentiment & Feedback", FWOE: "Forms & Workflow OE",
+      RRMA: "Records Request ATIP", SRMEN: "SRM Enhanced", SRMES: "SRM Essentials", SRMEE: "SRM E&E",
+      AGOM: "Agenda OE", AGLE: "Agenda LE", AGPE: "Agenda PE", MMVC: "Votecast", VIDS: "Live Manager",
+      BOCO: "B&C", PCLH: "PCL Enhanced", PCLT: "PCL Enterprise"
+    };
+    return map[prefix] || "General";
+  }
+
+  // Other names for an edition, each taken from the catalog's own text.
+  const ALIASES = {
+    "CMS OE": "OpenCities",
+    "Agenda OE": "OneMeeting",
+    "Agenda LE": "Legistar MediaManager",
+    "Agenda PE": "Peak Legislate",
+    "RRM Enhanced": "GovQA",
+    "Records Request ATIP": "AMANDA",
+    "PCL Enterprise": "AMANDA",
+    "Sentiment & Feedback": "EngagementHQ"
+  };
+
+  const services = [];
+  C.sections.forEach((sec) => {
+    (C.rows[sec.key] || []).forEach((r) => {
+      const [page, id, name, type, credits, desc] = r;
+      const edition = editionOf(id, name);
+      services.push({
+        idx: services.length, page, id, name, type, credits, desc,
+        section: sec.key, edition,
+        scoping: credits === null,
+        perLearner: /pric(e|ing) is per learner/i.test(desc)
+      });
+    });
+  });
+  const byId = {};
+  services.forEach((s) => { (byId[s.id] = byId[s.id] || []).push(s); });
+  services.forEach((s) => {
+    s.otherSections = byId[s.id].filter((o) => o !== s).map((o) => SECTION[o.section].name);
+    s.hay = [
+      s.id, s.id.replace(/-/g, ""), s.name, SECTION[s.section].name, s.type, s.edition,
+      ALIASES[s.edition] || "", s.desc, s.scoping ? "scoping required" : s.credits + " credits",
+      s.perLearner ? "per learner" : "", "page " + s.page
+    ].join(" \u0001 ").toLowerCase();
+  });
+
+  const EDITION_ORDER = [];
+  const editionSections = {};
+  services.forEach((s) => {
+    if (s.edition === "General") return;
+    if (!editionSections[s.edition]) { editionSections[s.edition] = new Set(); EDITION_ORDER.push(s.edition); }
+    editionSections[s.edition].add(s.section);
+  });
+  const TYPES = [...new Set(services.map((s) => s.type))];
+
+  /* ---------- State ---------- */
+  const state = {
+    q: "", sections: new Set(), editions: new Set(), types: new Set(),
+    includeGeneral: true, min: "", max: "", scoping: "include", learner: "any",
+    sort: "catalog", group: true, dedupe: false
+  };
+  const plan = new Map(); // idx -> quantity
+
+  /* ---------- Static content ---------- */
+  function renderStatic() {
+    const m = C.meta;
+    $("kicker").textContent = m.title;
+    $("page-title").textContent = m.subtitle;
+    $("header-meta").innerHTML = `Version ${esc(m.version)}<br>Published ${esc(m.published)} | ${esc(m.region)}`;
+    $("intro").textContent = m.intro;
+    const gs = m.gettingStarted;
+    $("getting-started").innerHTML =
+      `<div><p>${esc(gs.summary)}</p><p>${esc(gs.partner)}</p><p><strong>${esc(gs.closing)}</strong></p></div>` +
+      gs.options.map((o) => `<div class="gs-option"><strong>${esc(o.name)}</strong>${esc(o.text)}</div>`).join("");
+    $("contact-heading").textContent = m.contact.heading;
+    $("contact-text").textContent = m.contact.text;
+    $("contact-email").textContent = m.contact.email;
+    $("contact-email").href = "mailto:" + m.contact.email;
+    $("source-note").textContent = `Source: ${m.title} - ${m.subtitle} | Version ${m.version} | Published: ${m.published} | ${m.region}. ${services.length} listings.`;
+  }
+
+  function checkbox(group, value, label, count, swatch) {
+    const sw = swatch ? `<span class="swatch" style="background:${swatch}"></span>` : "";
+    return `<label class="check">${sw}<input type="checkbox" data-group="${group}" value="${esc(value)}"> <span>${esc(label)}</span><span class="count">${count}</span></label>`;
+  }
+
+  function renderFilterControls() {
+    // Editions grouped by the section they appear in
+    let html = "";
+    C.sections.forEach((sec) => {
+      const eds = EDITION_ORDER.filter((e) => editionSections[e].has(sec.key));
+      if (!eds.length) return;
+      html += `<div class="edition-group-label">${esc(sec.name)}</div>`;
+      eds.forEach((e) => {
+        const n = services.filter((s) => s.edition === e).length;
+        const alias = ALIASES[e] ? ` (${ALIASES[e].split(" ")[0]})` : "";
+        html += checkbox("editions", e, e + alias, n);
+      });
+    });
+    const secsWithoutEditions = C.sections.filter((sec) => !EDITION_ORDER.some((e) => editionSections[e].has(sec.key)));
+    if (secsWithoutEditions.length) {
+      html += `<p class="hint" style="margin-top:10px">${esc(secsWithoutEditions.map((s) => s.name).join(", "))} list no edition-specific services; use Catalog section.</p>`;
+    }
+    $("edition-filters").innerHTML = html;
+
+    $("section-filters").innerHTML = C.sections.map((sec) =>
+      checkbox("sections", sec.key, sec.name, services.filter((s) => s.section === sec.key).length, sec.color)).join("");
+
+    $("type-filters").innerHTML = TYPES.map((t) =>
+      checkbox("types", t, t, services.filter((s) => s.type === t).length)).join("");
+
+    $("presets").innerHTML = [["Up to 10", "", 10], ["Up to 25", "", 25], ["Up to 50", "", 50], ["51 to 100", 51, 100], ["Over 100", 101, ""]]
+      .map(([l, a, b]) => `<button type="button" class="chip-btn" data-min="${a}" data-max="${b}">${l}</button>`).join("");
+  }
+
+  /* ---------- Query parsing ---------- */
+  function parseQuery(q) {
+    const terms = [];
+    const re = /(-?)(?:(\w+):)?(?:"([^"]*)"|(\S+))/g;
+    let m;
+    while ((m = re.exec(q)) !== null) {
+      const neg = m[1] === "-";
+      const field = m[2] ? m[2].toLowerCase() : null;
+      const value = (m[3] !== undefined ? m[3] : m[4] || "").trim();
+      if (!value) continue;
+      terms.push({ neg, field, value: value.toLowerCase() });
+    }
+    return terms;
+  }
+
+  function creditTest(expr) {
+    let m;
+    if ((m = expr.match(/^(\d+)\s*-\s*(\d+)$/))) { const a = +m[1], b = +m[2]; return (c) => c !== null && c >= a && c <= b; }
+    if ((m = expr.match(/^(<=|>=|<|>|=)?\s*(\d+)$/))) {
+      const n = +m[2];
+      const op = m[1] || "=";
+      return (c) => c !== null && ({ "<": c < n, "<=": c <= n, ">": c > n, ">=": c >= n, "=": c === n })[op];
+    }
+    if (/^scop/.test(expr)) return (c) => c === null;
+    return () => false;
+  }
+
+  function termMatches(s, t) {
+    const v = t.value;
+    switch (t.field) {
+      case "credits": case "credit": case "c": return creditTest(v)(s.credits);
+      case "id": return s.id.toLowerCase().includes(v) || s.id.replace(/-/g, "").toLowerCase().includes(v.replace(/-/g, ""));
+      case "name": return s.name.toLowerCase().includes(v);
+      case "type": return s.type.toLowerCase().includes(v);
+      case "section": return SECTION[s.section].name.toLowerCase().includes(v);
+      case "product": case "edition": return (s.edition + " " + (ALIASES[s.edition] || "")).toLowerCase().includes(v);
+      case "desc": case "description": return s.desc.toLowerCase().includes(v);
+      case "page": return String(s.page) === v;
+      default: return s.hay.includes(t.field ? t.field + ":" + v : v);
+    }
+  }
+
+  /* ---------- Filtering ---------- */
+  function filtered() {
+    const terms = parseQuery(state.q);
+    const min = state.min === "" ? null : Number(state.min);
+    const max = state.max === "" ? null : Number(state.max);
+    const editionAreas = new Set();
+    state.editions.forEach((e) => editionSections[e] && editionSections[e].forEach((k) => editionAreas.add(k)));
+    const seen = new Set();
+
+    let list = services.filter((s) => {
+      if (state.sections.size && !state.sections.has(s.section)) return false;
+      if (state.editions.size) {
+        const ok = state.editions.has(s.edition) ||
+          (state.includeGeneral && s.edition === "General" && editionAreas.has(s.section));
+        if (!ok) return false;
+      }
+      if (state.types.size && !state.types.has(s.type)) return false;
+      if (state.learner === "per" && !s.perLearner) return false;
+      if (state.learner === "flat" && s.perLearner) return false;
+      if (s.scoping) {
+        if (state.scoping === "exclude") return false;
+      } else {
+        if (state.scoping === "only") return false;
+        if (min !== null && s.credits < min) return false;
+        if (max !== null && s.credits > max) return false;
+      }
+      for (const t of terms) {
+        const hit = termMatches(s, t);
+        if (t.neg ? hit : !hit) return false;
+      }
+      return true;
+    });
+
+    if (state.dedupe) {
+      list = list.filter((s) => (seen.has(s.id) ? false : (seen.add(s.id), true)));
+    }
+
+    const cred = (s, hi) => (s.scoping ? (hi ? -1 : Infinity) : s.credits);
+    const sorters = {
+      catalog: (a, b) => a.idx - b.idx,
+      "credits-asc": (a, b) => cred(a, false) - cred(b, false) || a.idx - b.idx,
+      "credits-desc": (a, b) => cred(b, true) - cred(a, true) || a.idx - b.idx,
+      name: (a, b) => a.name.localeCompare(b.name),
+      id: (a, b) => a.id.localeCompare(b.id)
+    };
+    return list.sort(sorters[state.sort]);
+  }
+
+  /* ---------- Rendering ---------- */
+  function row(s, showSection) {
+    const inPlan = plan.has(s.idx);
+    const tags = [
+      showSection ? `<span class="tag" style="border-left:4px solid ${SECTION[s.section].color}">${esc(SECTION[s.section].name)}</span>` : "",
+      `<span class="tag">${esc(s.type)}</span>`,
+      s.edition !== "General" ? `<span class="tag edition">${esc(s.edition)}</span>` : "",
+      s.perLearner ? `<span class="tag learner">Per learner</span>` : "",
+      s.otherSections.length ? `<span class="tag dup" title="Same ID also listed in: ${esc(s.otherSections.join(", "))}">Also in ${esc(s.otherSections.join(", "))}</span>` : ""
+    ].join("");
+    const long = s.desc.length > 260 || s.desc.split("\n").length > 3;
+    const credits = s.scoping
+      ? `<span class="credits-scope">Scoping Required</span>`
+      : `<span class="credits-num">${s.credits.toLocaleString()}</span><span class="credits-unit">${s.perLearner ? "credits per learner" : "credits"}</span>`;
+    return `<tr class="${inPlan ? "in-plan" : ""}">
+      <td class="col-id">${esc(s.id)}<br><span class="page-ref">p. ${s.page}</span></td>
+      <td>
+        <p class="svc-name">${esc(s.name)}</p>
+        <div class="tags">${tags}</div>
+        <p class="desc${long ? " clamp" : ""}" id="d${s.idx}">${esc(s.desc)}</p>
+        ${long ? `<button type="button" class="link-btn" data-expand="${s.idx}" aria-expanded="false" aria-controls="d${s.idx}">Show full description</button>` : ""}
+      </td>
+      <td class="col-credits">${credits}</td>
+      <td class="col-add"><button type="button" class="add-btn" data-add="${s.idx}" aria-pressed="${inPlan}">${inPlan ? "In plan" : "Add"}</button></td>
+    </tr>`;
+  }
+
+  function table(list, showSection) {
+    return `<table class="svc"><thead><tr><th>ID</th><th>Service</th><th style="text-align:right">Credits</th><th><span class="sr-only">Plan</span></th></tr></thead><tbody>${list.map((s) => row(s, showSection)).join("")}</tbody></table>`;
+  }
+
+  function render() {
+    const list = filtered();
+    const total = state.dedupe ? Object.keys(byId).length : services.length;
+    $("count").innerHTML = `<strong>${list.length}</strong> of ${total} services`;
+
+    if (!list.length) {
+      $("results").innerHTML = `<div class="empty"><p>No services match these filters.</p><button class="btn" type="button" data-action="reset">Clear all filters</button></div>`;
+    } else if (state.group) {
+      $("results").innerHTML = C.sections.map((sec) => {
+        const items = list.filter((s) => s.section === sec.key);
+        if (!items.length) return "";
+        return `<section class="section-block" style="--accent:${sec.color}">
+          <div class="section-head"><h2>${esc(sec.name)}</h2><p>${esc(sec.tagline)}</p></div>
+          ${table(items, false)}</section>`;
+      }).join("");
+    } else {
+      $("results").innerHTML = table(list, true);
+    }
+    renderActive();
+    syncUrl();
+  }
+
+  function renderActive() {
+    const pills = [];
+    if (state.q) pills.push(["q", "", `Search: ${state.q}`]);
+    state.editions.forEach((e) => pills.push(["editions", e, e]));
+    state.sections.forEach((k) => pills.push(["sections", k, SECTION[k].name]));
+    state.types.forEach((t) => pills.push(["types", t, t]));
+    if (state.min !== "" || state.max !== "") pills.push(["range", "", `Credits ${state.min || 0} to ${state.max || "any"}`]);
+    if (state.scoping !== "include") pills.push(["scoping", "", state.scoping === "only" ? "Scoping Required only" : "No Scoping Required"]);
+    if (state.learner !== "any") pills.push(["learner", "", state.learner === "per" ? "Per learner" : "Not per learner"]);
+    $("active-filters").innerHTML = pills.map(([g, v, l]) =>
+      `<button type="button" class="pill" data-clear="${g}" data-value="${esc(v)}" aria-label="Remove filter ${esc(l)}">${esc(l)}</button>`).join("");
+  }
+
+  /* ---------- Plan ---------- */
+  function renderPlan() {
+    let total = 0, scopeCount = 0;
+    const items = [...plan.entries()].map(([idx, qty]) => {
+      const s = services[idx];
+      let sub = "Scoping Required";
+      if (!s.scoping) { const v = s.credits * (s.perLearner ? qty : 1); total += v; sub = v.toLocaleString(); }
+      else scopeCount++;
+      const qtyControl = s.perLearner
+        ? `<label>Learners <input type="number" min="1" value="${qty}" data-qty="${idx}"></label>`
+        : "";
+      return `<div class="plan-item">
+        <div><div class="pi-name">${esc(s.name)}</div><div class="pi-id">${esc(s.id)} | ${esc(SECTION[s.section].name)}</div></div>
+        <div class="pi-sub">${sub}</div>
+        <div class="pi-controls">${qtyControl}<button type="button" class="link-btn" data-remove="${idx}">Remove</button></div>
+      </div>`;
+    });
+    $("plan-body").innerHTML = items.length ? items.join("") : `<p>Add services from the list to total their credits.</p>`;
+    $("plan-total").textContent = total.toLocaleString();
+    $("plan-note").textContent = scopeCount
+      ? `${scopeCount} Scoping Required service${scopeCount > 1 ? "s are" : " is"} not included in the total.`
+      : "Per-learner services multiply by the learner count.";
+    $("plan-open").textContent = `Credit plan (${plan.size}) | ${total.toLocaleString()} credits`;
+  }
+
+  function planText() {
+    const lines = [...plan.entries()].map(([idx, qty]) => {
+      const s = services[idx];
+      if (s.scoping) return `${s.id} | ${s.name} | Scoping Required`;
+      const v = s.credits * (s.perLearner ? qty : 1);
+      return `${s.id} | ${s.name} | ${s.perLearner ? `${s.credits} x ${qty} learners = ${v}` : v} credits`;
+    });
+    const total = [...plan.entries()].reduce((a, [idx, qty]) => {
+      const s = services[idx]; return a + (s.scoping ? 0 : s.credits * (s.perLearner ? qty : 1));
+    }, 0);
+    return lines.join("\n") + `\n\nTotal: ${total} credits\nSource: ${C.meta.title}, Version ${C.meta.version}`;
+  }
+
+  function togglePlan(open) {
+    $("plan").dataset.open = open; $("scrim").dataset.open = open;
+    $("plan").setAttribute("aria-hidden", String(!open));
+    if (open) $("plan-close").focus();
+  }
+
+  /* ---------- URL state ---------- */
+  function syncUrl() {
+    const p = new URLSearchParams();
+    if (state.q) p.set("q", state.q);
+    if (state.sections.size) p.set("sec", [...state.sections].join(","));
+    if (state.editions.size) p.set("ed", [...state.editions].join("|"));
+    if (state.types.size) p.set("ty", [...state.types].join("|"));
+    if (!state.includeGeneral) p.set("gen", "0");
+    if (state.min !== "") p.set("min", state.min);
+    if (state.max !== "") p.set("max", state.max);
+    if (state.scoping !== "include") p.set("sc", state.scoping);
+    if (state.learner !== "any") p.set("pl", state.learner);
+    if (state.sort !== "catalog") p.set("sort", state.sort);
+    if (!state.group) p.set("grp", "0");
+    if (state.dedupe) p.set("dd", "1");
+    const qs = p.toString();
+    history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+  }
+
+  function loadUrl() {
+    const p = new URLSearchParams(location.search);
+    state.q = p.get("q") || "";
+    (p.get("sec") || "").split(",").filter((k) => SECTION[k]).forEach((k) => state.sections.add(k));
+    (p.get("ed") || "").split("|").filter((e) => editionSections[e]).forEach((e) => state.editions.add(e));
+    (p.get("ty") || "").split("|").filter((t) => TYPES.includes(t)).forEach((t) => state.types.add(t));
+    state.includeGeneral = p.get("gen") !== "0";
+    state.min = p.get("min") || ""; state.max = p.get("max") || "";
+    state.scoping = ["include", "exclude", "only"].includes(p.get("sc")) ? p.get("sc") : "include";
+    state.learner = ["any", "per", "flat"].includes(p.get("pl")) ? p.get("pl") : "any";
+    state.sort = p.get("sort") || "catalog";
+    state.group = p.get("grp") !== "0";
+    state.dedupe = p.get("dd") === "1";
+  }
+
+  function pushStateToControls() {
+    $("q").value = state.q;
+    document.querySelectorAll("input[data-group]").forEach((el) => { el.checked = state[el.dataset.group].has(el.value); });
+    $("include-general").checked = state.includeGeneral;
+    $("min").value = state.min; $("max").value = state.max;
+    $("scoping").value = state.scoping; $("learner").value = state.learner;
+    $("sort").value = state.sort; $("group").checked = state.group; $("dedupe").checked = state.dedupe;
+  }
+
+  function resetAll() {
+    state.q = ""; state.sections.clear(); state.editions.clear(); state.types.clear();
+    state.includeGeneral = true; state.min = ""; state.max = ""; state.scoping = "include"; state.learner = "any";
+    state.dedupe = false;
+    pushStateToControls(); render();
+  }
+
+  function toast(msg) {
+    const t = $("toast"); t.textContent = msg; t.style.display = "block";
+    clearTimeout(toast._t); toast._t = setTimeout(() => { t.style.display = "none"; }, 2000);
+  }
+
+  async function copy(text, msg) {
+    try { await navigator.clipboard.writeText(text); toast(msg); }
+    catch (e) { window.prompt("Copy this:", text); }
+  }
+
+  function csv(list) {
+    const cell = (v) => `"${String(v === null ? "" : v).replace(/"/g, '""')}"`;
+    const head = ["Section", "ID", "Service", "Service Type", "Product/Edition", "Credits", "Per Learner", "Catalog Page", "Description"];
+    const rows = list.map((s) => [SECTION[s.section].name, s.id, s.name, s.type, s.edition,
+      s.scoping ? "Scoping Required" : s.credits, s.perLearner ? "Yes" : "No", s.page, s.desc].map(cell).join(","));
+    return "\uFEFF" + [head.map(cell).join(",")].concat(rows).join("\r\n");
+  }
+
+  /* ---------- Events ---------- */
+  function bind() {
+    let debounce;
+    $("q").addEventListener("input", (e) => { clearTimeout(debounce); debounce = setTimeout(() => { state.q = e.target.value.trim(); render(); }, 120); });
+
+    document.addEventListener("change", (e) => {
+      const el = e.target;
+      if (el.dataset.group) { el.checked ? state[el.dataset.group].add(el.value) : state[el.dataset.group].delete(el.value); render(); }
+      else if (el.id === "include-general") { state.includeGeneral = el.checked; render(); }
+      else if (el.id === "scoping") { state.scoping = el.value; render(); }
+      else if (el.id === "learner") { state.learner = el.value; render(); }
+      else if (el.id === "sort") { state.sort = el.value; render(); }
+      else if (el.id === "group") { state.group = el.checked; render(); }
+      else if (el.id === "dedupe") { state.dedupe = el.checked; render(); }
+      else if (el.dataset.qty) { plan.set(+el.dataset.qty, Math.max(1, parseInt(el.value, 10) || 1)); renderPlan(); }
+    });
+    ["min", "max"].forEach((id) => $(id).addEventListener("input", (e) => { state[id] = e.target.value; render(); }));
+
+    document.addEventListener("click", (e) => {
+      const t = e.target.closest("button");
+      if (!t) return;
+      if (t.dataset.add !== undefined) {
+        const idx = +t.dataset.add;
+        plan.has(idx) ? plan.delete(idx) : plan.set(idx, 1);
+        const on = plan.has(idx);
+        t.setAttribute("aria-pressed", on); t.textContent = on ? "In plan" : "Add";
+        t.closest("tr").classList.toggle("in-plan", on);
+        renderPlan();
+      } else if (t.dataset.expand !== undefined) {
+        const d = $("d" + t.dataset.expand); const open = d.classList.toggle("clamp") === false;
+        t.setAttribute("aria-expanded", open); t.textContent = open ? "Show less" : "Show full description";
+      } else if (t.dataset.min !== undefined) {
+        state.min = t.dataset.min; state.max = t.dataset.max; $("min").value = state.min; $("max").value = state.max; render();
+      } else if (t.dataset.clear) {
+        const g = t.dataset.clear, v = t.dataset.value;
+        if (g === "q") state.q = "";
+        else if (g === "range") { state.min = ""; state.max = ""; }
+        else if (g === "scoping") state.scoping = "include";
+        else if (g === "learner") state.learner = "any";
+        else state[g].delete(v);
+        pushStateToControls(); render();
+      } else if (t.dataset.remove !== undefined) {
+        plan.delete(+t.dataset.remove); renderPlan(); render();
+      } else if (t.dataset.action === "reset" || t.id === "reset") {
+        resetAll();
+      }
+    });
+
+    $("filter-toggle").addEventListener("click", () => {
+      const f = $("filters"); const open = f.dataset.open !== "true";
+      f.dataset.open = open; $("filter-toggle").setAttribute("aria-expanded", open);
+      $("filter-toggle").textContent = open ? "Hide filters" : "Show filters";
+    });
+    $("copy-link").addEventListener("click", () => copy(location.href, "Link copied"));
+    $("export").addEventListener("click", () => {
+      const blob = new Blob([csv(filtered())], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = `experience-services-${C.meta.version}.csv`;
+      document.body.appendChild(a); a.click(); a.remove();
+    });
+    $("plan-open").addEventListener("click", () => togglePlan(true));
+    $("plan-close").addEventListener("click", () => togglePlan(false));
+    $("scrim").addEventListener("click", () => togglePlan(false));
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && $("plan").dataset.open === "true") togglePlan(false); });
+    $("plan-copy").addEventListener("click", () => plan.size ? copy(planText(), "Plan copied") : toast("The plan is empty"));
+    $("plan-clear").addEventListener("click", () => { plan.clear(); renderPlan(); render(); });
+  }
+
+  renderStatic();
+  renderFilterControls();
+  loadUrl();
+  pushStateToControls();
+  bind();
+  render();
+  renderPlan();
+})();
+</script>
+</body>
+</html>
