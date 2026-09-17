@@ -31,9 +31,13 @@ Text is reproduced as written, including the source's own typos and inconsistenc
 These are computed in `index.html`, not typed into the data:
 
 - **Per learner** is true when the description contains "Price is per learner" or "Pricing is per learner".
-- **Product/edition** comes from the service name first (PCL Enterprise, PCL Enhanced, RRM Enhanced, RRM Essentials, Agenda LE/OE/PE), then the ID prefix (CMSO = CMS OE, CMSV = CMS VE, STFE, FWOE, RRMA, SRMEN, SRMES, SRMEE, AGOM, AGLE, AGPE, MMVC = Votecast, VIDS = Live Manager, BOCO = B&C, PCLH, PCLT). `GXC-CRED-*` services are "General".
-- **Search aliases** come only from equivalences stated in the catalog text: OpenCities (CMS OE), OneMeeting (Agenda OE), Legistar and MediaManager (Agenda LE), Peak and Legislate (Agenda PE), GovQA (RRM Enhanced), AMANDA (Records Request ATIP and PCL Enterprise), EngagementHQ (Sentiment & Feedback).
+- **Product** (nested under each catalog section in the filters) comes from the service name first (PCL Enterprise, PCL Enhanced, RRM Enhanced, RRM Essentials, Agenda LE/OE/PE), then the ID prefix (CMSO = CMS OE, CMSV = CMS VE, STFE, FWOE, RRMA, SRMEN, SRMES, SRMEE, AGOM, AGLE, AGPE, MMVC = Votecast, VIDS = Live Manager, BOCO = B&C, PCLH, PCLT). `GXC-CRED-*` services are listed as "Services for all products" within their section.
+- **Legacy product names** are never displayed, but still work in search so older terminology finds the right services. Each pairing is stated in the catalog text: OpenCities (CMS OE), OneMeeting (Agenda OE), Legistar and MediaManager (Agenda LE), Peak and Legislate (Agenda PE), GovQA (RRM Enhanced), AMANDA (Records Request ATIP and PCL Enterprise), EngagementHQ (Sentiment & Feedback).
 
 ## Updating for a new catalog version
 
 Edit `data.js` only: update `meta`, then add, remove, or change rows. Row format is `[page, id, name, serviceType, credits, description]`, with `credits: null` for "Scoping Required".
+
+## Fonts
+
+The page uses the brand guide stack with one addition: Sofia Pro, then Century Gothic, then Questrial (a free Google Font with a similar geometric shape), then Arial. Questrial loads from Google Fonts so visitors without Century Gothic still see something close to it. Questrial has a single weight, so browsers generate the bold. Check with Marketing if the fallback needs approval.
