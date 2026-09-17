@@ -6,230 +6,306 @@
 <title>Experience Services Catalog | Government Experience Cloud</title>
 <style>
 :root {
-  --granicus-red: #D41F37;
-  --granicus-coral: #EF6A57;
-  --granicus-dark-red: #C42D3D;
-  --granicus-light-gray: #EEEEEE;
-  --granicus-near-black: #1C1C1C;
-  --granicus-blue: #3879AF;
-  --granicus-dark-blue: #38668A;
-  --granicus-green: #4CA382;
-  --granicus-dark-green: #4C7960;
-  --text-muted: #555555;
-  --line: #DDDDDD;
-  --surface: #FFFFFF;
-  --font: "Sofia Pro", "Century Gothic", Arial, sans-serif;
+  --red: #D41F37;
+  --red-dark: #C42D3D;
+  --red-hover: #A92534;
+  --coral: #EF6A57;
+  --blue: #3879AF;
+  --blue-dark: #38668A;
+  --green: #4CA382;
+  --green-dark: #4C7960;
+  --gray-light: #EEEEEE;
+  --ink: #1C1C1C;
+  --ink-soft: #3D3D3D;
+  --muted: #5E5E5E;
+  --line: #E2E2E2;
+  --pink-1: #F9E4E7;
+  --pink-2: #FCF1F2;
+  --blue-1: #E4ECF4;
+  --blue-2: #F1F5F9;
+  --font: "Century Gothic", CenturyGothic, AppleGothic, Arial, sans-serif;
+  --radius: 10px;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body {
-  margin: 0;
-  background: var(--surface);
-  color: var(--granicus-near-black);
-  font-family: var(--font);
-  font-size: 15px;
-  line-height: 1.5;
-}
-a { color: var(--granicus-dark-red); }
-button, input, select { font: inherit; color: inherit; }
-:focus-visible { outline: 3px solid var(--granicus-dark-blue); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+body { margin: 0; background: #FFFFFF; color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.6; }
+button, input, select, textarea, code { font-family: var(--font); font-size: inherit; color: inherit; }
+a { color: var(--red-dark); }
+:focus-visible { outline: 3px solid var(--blue-dark); outline-offset: 2px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+@media (max-width: 640px) { .wrap { padding: 0 18px; } }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 4px; padding: 11px 22px; font-weight: 700; cursor: pointer; text-decoration: none; border: 2px solid var(--red-dark); line-height: 1.2; }
+.btn-red { background: var(--red-dark); color: #FFFFFF; }
+.btn-red:hover { background: var(--red-hover); border-color: var(--red-hover); }
+.btn-ghost { background: #FFFFFF; color: var(--red-dark); }
+.btn-ghost:hover { background: var(--pink-2); }
+.btn-sm { padding: 7px 14px; font-size: 14px; }
+.link-btn { background: none; border: 0; padding: 0; color: var(--red-dark); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
 
 /* Header */
-.site-header { border-bottom: 1px solid var(--line); background: var(--surface); }
-.header-inner { max-width: 1320px; margin: 0 auto; padding: 20px 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
-.logo { height: 36px; width: auto; display: block; }
-.header-text { display: flex; flex-direction: column; }
-.header-text .kicker { color: var(--granicus-dark-red); font-size: 14px; }
-.header-text h1 { margin: 0; font-size: 26px; font-weight: 700; line-height: 1.2; }
-.header-meta { margin-left: auto; color: var(--text-muted); font-size: 13px; text-align: right; }
+.site-header { background: #FFFFFF; position: relative; z-index: 2; }
+.header-row { display: flex; align-items: center; gap: 24px; min-height: 88px; }
+.logo { height: 38px; width: auto; display: block; }
+.header-title { font-size: 15px; color: var(--ink-soft); }
+.header-row .btn { margin-left: auto; }
 
-/* Hero: search is the main job */
-.hero { background: var(--granicus-light-gray); }
-.hero-inner { max-width: 1320px; margin: 0 auto; padding: 28px 24px 24px; }
-.hero p.intro { margin: 0 0 16px; max-width: 70ch; }
-.search-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: stretch; }
-.search-box { flex: 1 1 420px; position: relative; }
-.search-box input {
-  width: 100%; padding: 14px 16px; font-size: 17px;
-  border: 2px solid #BBBBBB; border-radius: 6px; background: #FFFFFF;
+/* Hero */
+.hero {
+  position: relative; overflow: hidden;
+  background:
+    radial-gradient(circle at -6% 115%, var(--pink-1) 0 210px, var(--pink-2) 210px 360px, rgba(252,241,242,.55) 360px 520px, transparent 520px),
+    radial-gradient(circle at 104% -18%, var(--blue-1) 0 230px, var(--blue-2) 230px 380px, rgba(241,245,249,.6) 380px 540px, transparent 540px),
+    #FFFFFF;
 }
-.search-box input:focus { border-color: var(--granicus-dark-blue); outline: none; }
-.search-help { font-size: 13px; color: var(--text-muted); margin: 8px 0 0; }
-.search-help code { background: #FFFFFF; border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; font-size: 12px; }
-details.getting-started { margin-top: 16px; }
-details.getting-started summary { cursor: pointer; color: var(--granicus-dark-red); }
-.gs-body { margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; max-width: 900px; }
-.gs-body p { margin: 0 0 8px; }
-.gs-option { background: #FFFFFF; border-radius: 6px; padding: 12px 14px; }
-.gs-option strong { display: block; }
+.hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(#DADADA 1px, transparent 1.2px); background-size: 22px 22px; opacity: .45;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 35%, #000 65%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0%, #000 35%, #000 65%, transparent 100%);
+}
+.hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 56px; align-items: center; padding-block: 56px 64px; }
+@media (max-width: 980px) { .hero-grid { grid-template-columns: 1fr; gap: 28px; padding-block: 32px 36px; } }
+.eyebrow { display: flex; align-items: center; gap: 10px; color: var(--red-dark); font-size: 16px; margin: 0 0 14px; }
+.eyebrow .dots { display: inline-flex; }
+.eyebrow .dots i { width: 18px; height: 18px; border-radius: 50%; background: var(--red); margin-left: -7px; }
+.eyebrow .dots i:nth-child(1) { opacity: .18; margin-left: 0; }
+.eyebrow .dots i:nth-child(2) { opacity: .32; }
+.eyebrow .dots i:nth-child(3) { opacity: .5; }
+.hero h1 { font-size: clamp(34px, 4.4vw, 54px); line-height: 1.12; font-weight: 700; color: var(--ink-soft); margin: 0 0 18px; letter-spacing: -0.01em; max-width: 16ch; }
+.hero .lede { font-size: 19px; color: var(--ink-soft); margin: 0 0 28px; max-width: 52ch; }
+.meta-line { font-size: 14px; color: var(--muted); margin: 0 0 22px; }
+
+.search { position: relative; max-width: 680px; }
+.search svg { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; color: var(--muted); pointer-events: none; }
+.search input { width: 100%; padding: 18px 20px 18px 54px; font-size: 17px; border: 1px solid #CFCFCF; border-radius: 6px; background: #FFFFFF; box-shadow: 0 6px 22px rgba(56,102,138,.10); }
+.search input:focus { outline: none; border-color: var(--blue-dark); box-shadow: 0 0 0 3px rgba(56,102,138,.25), 0 6px 22px rgba(56,102,138,.10); }
+details.tips { margin-top: 12px; max-width: 680px; font-size: 14px; color: var(--muted); }
+details.tips summary { cursor: pointer; color: var(--red-dark); width: max-content; }
+.tips-grid { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin-top: 10px; background: rgba(255,255,255,.9); padding: 14px 16px; border-radius: 6px; border: 1px solid var(--line); }
+.tips-grid code { background: var(--blue-2); color: var(--blue-dark); border-radius: 4px; padding: 1px 8px; font-size: 13px; white-space: nowrap; }
+
+/* Stat callouts modeled on granicus.com chips */
+.stats { display: grid; gap: 18px; justify-items: start; }
+@media (max-width: 980px) { .stats { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); } }
+@media (max-width: 640px) { .stats, .header-title, .how summary .hint { display: none; } }
+.stat { background: #FFFFFF; border-radius: 12px 12px 12px 12px; box-shadow: 0 8px 26px rgba(28,28,28,.08); overflow: hidden; min-width: 250px; }
+.stat:nth-child(2) { margin-left: 48px; }
+.stat:nth-child(3) { margin-left: 16px; }
+@media (max-width: 980px) { .stat, .stat:nth-child(2), .stat:nth-child(3) { margin-left: 0; min-width: 0; } }
+.stat-head { background: var(--blue-dark); color: #FFFFFF; font-weight: 700; padding: 7px 18px; font-size: 16px; }
+.stat-body { padding: 8px 18px 10px; font-size: 15px; color: var(--ink-soft); }
+.stat-body strong { color: var(--blue-dark); font-size: 20px; }
+
+/* How it works */
+.how { background: var(--gray-light); }
+.how details > summary { list-style: none; cursor: pointer; padding: 18px 0; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 16px; }
+.how details > summary::-webkit-details-marker { display: none; }
+.how summary .chev { width: 28px; height: 28px; border-radius: 50%; background: #FFFFFF; display: grid; place-items: center; color: var(--red-dark); transition: transform .2s; }
+.how details[open] summary .chev { transform: rotate(180deg); }
+.how summary .hint { font-weight: 400; color: var(--muted); font-size: 14px; }
+.how-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: start; padding-bottom: 28px; }
+@media (max-width: 900px) { .how-grid { grid-template-columns: 1fr; } }
+.how-grid p { margin: 0 0 10px; max-width: 60ch; }
+.option { background: #FFFFFF; border-radius: var(--radius); padding: 22px; text-align: center; }
+.option svg { width: 44px; height: 44px; color: var(--green-dark); margin-bottom: 8px; }
+.option:nth-child(3) svg { color: var(--blue-dark); }
+.option h3 { margin: 0 0 6px; font-size: 17px; }
+.option p { margin: 0; color: var(--ink-soft); }
 
 /* Layout */
-.layout { max-width: 1320px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 290px 1fr; gap: 32px; align-items: start; }
-@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+.layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 40px; align-items: start; padding-top: 36px; padding-bottom: 40px; }
+@media (max-width: 960px) { .layout { grid-template-columns: 1fr; gap: 20px; } }
 
 /* Filters */
-.filters { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 6px; }
-@media (max-width: 900px) { .filters { position: static; max-height: none; } }
+.filters { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; padding: 4px 8px 4px 2px; scrollbar-width: thin; }
+@media (max-width: 960px) { .filters { position: static; max-height: none; } }
 .filter-toggle { display: none; }
-@media (max-width: 900px) {
-  .filter-toggle { display: block; width: 100%; padding: 10px; border: 1px solid var(--line); background: #FFFFFF; border-radius: 6px; cursor: pointer; margin-bottom: 12px; }
-  .filters[data-open="false"] .filter-groups { display: none; }
+@media (max-width: 960px) {
+  .filter-toggle { display: flex; width: 100%; }
+  .filters[data-open="false"] .filter-panel { display: none; }
+  .filter-panel { margin-top: 14px; }
 }
-.filter-group { border-top: 1px solid var(--line); padding: 14px 0; }
-.filter-group:first-child { border-top: 0; padding-top: 0; }
-.filter-group h2 { font-size: 15px; margin: 0 0 8px; font-weight: 700; }
-.filter-group .hint { font-size: 12px; color: var(--text-muted); margin: 0 0 8px; }
-.check { display: flex; align-items: flex-start; gap: 8px; padding: 3px 0; cursor: pointer; font-size: 14px; }
-.check input { margin-top: 4px; accent-color: var(--granicus-dark-red); }
-.check .count { margin-left: auto; color: var(--text-muted); font-size: 12px; padding-left: 8px; }
-.swatch { width: 4px; align-self: stretch; border-radius: 2px; flex: none; }
-.edition-group-label { font-size: 12px; color: var(--text-muted); margin: 10px 0 2px; }
-.range { display: flex; gap: 8px; align-items: center; }
-.range input { width: 100%; padding: 8px; border: 1px solid #BBBBBB; border-radius: 4px; }
-.presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.chip-btn { border: 1px solid var(--line); background: #FFFFFF; border-radius: 999px; padding: 3px 10px; font-size: 13px; cursor: pointer; }
-.chip-btn:hover { border-color: var(--granicus-dark-blue); }
-select.full { width: 100%; padding: 8px; border: 1px solid #BBBBBB; border-radius: 4px; background: #FFFFFF; }
-.link-btn { background: none; border: 0; padding: 0; color: var(--granicus-dark-red); cursor: pointer; text-decoration: underline; font-size: 13px; }
+.fgroup { padding: 18px 0; border-bottom: 1px solid var(--line); }
+.fgroup:first-child { padding-top: 0; }
+.fgroup h2 { font-size: 16px; margin: 0 0 10px; font-weight: 700; }
+.fhint { font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+
+.check { display: flex; align-items: flex-start; gap: 10px; padding: 5px 0; cursor: pointer; font-size: 14px; line-height: 1.4; }
+.check input { width: 17px; height: 17px; margin: 1px 0 0; flex: none; accent-color: var(--red-dark); cursor: pointer; }
+.check .count { margin-left: auto; padding-left: 10px; font-size: 12px; color: var(--muted); }
+
+.tree-sec { border-radius: 8px; }
+.tree-row { display: flex; align-items: flex-start; gap: 4px; }
+.tree-row .check { flex: 1; font-weight: 700; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; margin-top: 5px; }
+.twisty { flex: none; width: 28px; height: 28px; border: 0; background: none; cursor: pointer; border-radius: 50%; display: grid; place-items: center; color: var(--muted); }
+.twisty:hover { background: var(--gray-light); }
+.twisty svg { width: 14px; height: 14px; transition: transform .15s; }
+.twisty[aria-expanded="true"] svg { transform: rotate(90deg); }
+.twisty-spacer { width: 28px; flex: none; }
+.tree-kids { margin: 0 0 6px 17px; padding-left: 16px; border-left: 2px solid var(--line); }
+.tree-kids[hidden] { display: none; }
+.tree-kids .check { font-weight: 400; }
+
+.range { display: flex; align-items: center; gap: 10px; }
+.range input { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-radius: 4px; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip { border: 1px solid #D5D5D5; background: #FFFFFF; border-radius: 999px; padding: 4px 12px; font-size: 13px; cursor: pointer; }
+.chip:hover, .chip[aria-pressed="true"] { border-color: var(--blue-dark); color: var(--blue-dark); background: var(--blue-2); }
+select.full { width: 100%; padding: 9px 10px; border: 1px solid #CFCFCF; border-radius: 4px; background: #FFFFFF; }
 
 /* Results */
-.results-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.results-count { font-size: 18px; }
-.results-count strong { font-size: 22px; }
-.bar-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.bar-actions select { padding: 7px; border: 1px solid #BBBBBB; border-radius: 4px; background: #FFFFFF; }
-.btn { border: 1px solid var(--granicus-dark-red); color: var(--granicus-dark-red); background: #FFFFFF; border-radius: 4px; padding: 7px 12px; cursor: pointer; font-size: 14px; }
-.btn:hover { background: #FBEFF1; }
-.btn.primary { background: var(--granicus-dark-red); color: #FFFFFF; }
-.btn.primary:hover { background: #A92534; }
-.active-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-.active-filters:empty { display: none; }
-.pill { background: var(--granicus-light-gray); border: 0; border-radius: 999px; padding: 3px 10px; font-size: 13px; cursor: pointer; }
-.pill::after { content: " ×"; }
+.results-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+.count { font-size: 17px; color: var(--ink-soft); }
+.count strong { font-size: 26px; color: var(--ink); margin-right: 4px; }
+.bar-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.bar-actions select { padding: 8px 10px; border: 1px solid #CFCFCF; border-radius: 4px; background: #FFFFFF; }
+.switch { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.switch input { accent-color: var(--red-dark); width: 16px; height: 16px; }
 
-.section-block { margin-bottom: 28px; }
-.section-head { border-left: 6px solid var(--accent); padding: 2px 0 2px 14px; margin: 0 0 12px; }
-.section-head h2 { margin: 0; font-size: 20px; }
-.section-head p { margin: 2px 0 0; color: var(--text-muted); font-size: 14px; max-width: 80ch; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+.pills:empty { display: none; }
+.pill { display: inline-flex; align-items: center; gap: 8px; background: var(--blue-2); color: var(--blue-dark); border: 1px solid #D3E0EB; border-radius: 999px; padding: 4px 8px 4px 12px; font-size: 13px; cursor: pointer; }
+.pill span[aria-hidden] { width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF; display: grid; place-items: center; font-size: 14px; line-height: 1; }
+.pill:hover { border-color: var(--blue-dark); }
 
-table.svc { width: 100%; border-collapse: collapse; }
-table.svc th { text-align: left; font-size: 13px; font-weight: 700; color: var(--granicus-near-black); background: var(--granicus-light-gray); padding: 8px 10px; }
-table.svc td { padding: 12px 10px; vertical-align: top; border-bottom: 1px solid var(--line); }
-table.svc tr.in-plan td { background: #FBF4F5; }
-.col-id { width: 150px; font-size: 12px; color: var(--text-muted); word-break: break-word; }
-.col-credits { width: 96px; text-align: right; }
-.col-add { width: 92px; text-align: right; }
-.svc-name { font-weight: 700; margin: 0 0 4px; }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }
-.tag { font-size: 12px; border: 1px solid var(--line); border-radius: 3px; padding: 0 6px; color: var(--text-muted); background: #FFFFFF; }
-.tag.edition { color: var(--granicus-dark-blue); border-color: #C8D6E3; }
-.tag.learner { color: var(--granicus-dark-green); border-color: #C6DACD; }
-.tag.dup { color: var(--granicus-dark-red); border-color: #EBC7CC; }
-.desc { white-space: pre-line; margin: 0; font-size: 14px; color: #333333; max-width: 85ch; }
+.sec-block { margin-bottom: 36px; }
+.sec-head { display: flex; gap: 16px; align-items: flex-start; padding: 18px 20px; border-radius: var(--radius); background: var(--tint); margin-bottom: 12px; }
+.sec-head .ring { width: 34px; height: 34px; border-radius: 50%; flex: none; border: 7px solid var(--accent); opacity: .9; margin-top: 2px; }
+.sec-head h2 { margin: 0; font-size: 22px; line-height: 1.25; }
+.sec-head p { margin: 4px 0 0; color: var(--ink-soft); font-size: 14px; max-width: 78ch; }
+.sec-head .sec-count { margin-left: auto; white-space: nowrap; font-size: 13px; color: var(--muted); padding-top: 4px; }
+
+.svc { display: grid; grid-template-columns: minmax(0, 1fr) 132px; gap: 20px; padding: 20px 22px; border: 1px solid var(--line); border-radius: var(--radius); background: #FFFFFF; margin-bottom: 10px; }
+.svc.in-plan { border-color: var(--red-dark); box-shadow: inset 4px 0 0 var(--red-dark); }
+@media (max-width: 640px) { .svc { grid-template-columns: 1fr; gap: 12px; padding: 16px; } }
+.svc-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 4px; font-size: 12px; color: var(--muted); }
+.svc-id { letter-spacing: .02em; }
+.svc h3 { margin: 0 0 8px; font-size: 17px; line-height: 1.35; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.tag { font-size: 12px; padding: 2px 9px; border-radius: 4px; background: var(--gray-light); color: var(--ink-soft); }
+.tag.product { background: var(--blue-dark); color: #FFFFFF; }
+.tag.learner { background: #E7F1EC; color: var(--green-dark); }
+.tag.dup { background: var(--pink-2); color: var(--red-dark); }
+.tag.sec { background: #FFFFFF; border: 1px solid var(--line); }
+.tag.sec i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.desc { white-space: pre-line; margin: 0; color: var(--ink-soft); font-size: 14px; max-width: 82ch; }
 .desc.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.credits-num { font-size: 22px; font-weight: 700; color: var(--granicus-dark-red); line-height: 1.1; }
-.credits-unit { display: block; font-size: 12px; color: var(--text-muted); }
-.credits-scope { font-size: 13px; font-weight: 700; color: var(--granicus-dark-blue); }
-.add-btn { border: 1px solid var(--granicus-dark-red); background: #FFFFFF; color: var(--granicus-dark-red); border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 13px; }
-.add-btn[aria-pressed="true"] { background: var(--granicus-dark-red); color: #FFFFFF; }
-.page-ref { font-size: 12px; color: var(--text-muted); }
+.desc + .link-btn { margin-top: 6px; }
+.svc-side { display: flex; flex-direction: column; align-items: stretch; gap: 10px; text-align: center; }
+@media (max-width: 640px) { .svc-side { flex-direction: row; align-items: center; text-align: left; } }
+.credit-box { background: var(--blue-2); border-radius: 8px; padding: 10px 8px; }
+@media (max-width: 640px) { .credit-box { flex: 1; text-align: left; padding: 8px 14px; } }
+.credit-num { display: block; font-size: 28px; font-weight: 700; color: var(--red-dark); line-height: 1.1; }
+.credit-unit { display: block; font-size: 12px; color: var(--muted); }
+.credit-scope { display: block; font-size: 14px; font-weight: 700; color: var(--blue-dark); line-height: 1.3; }
+.add[aria-pressed="true"] { background: var(--red-dark); color: #FFFFFF; }
 
-@media (max-width: 720px) {
-  table.svc thead { display: none; }
-  table.svc, table.svc tbody, table.svc tr, table.svc td { display: block; width: 100%; }
-  table.svc tr { border-bottom: 1px solid var(--line); padding: 10px 0; }
-  table.svc td { border: 0; padding: 4px 0; text-align: left; }
-  .col-id, .col-credits, .col-add { width: auto; text-align: left; }
-}
-
-.empty { padding: 40px 24px; text-align: center; background: var(--granicus-light-gray); border-radius: 6px; }
-.empty p { margin: 0 0 12px; }
+.empty { text-align: center; padding: 56px 24px; border-radius: var(--radius); background: var(--gray-light); }
+.empty h2 { margin: 0 0 6px; font-size: 20px; }
+.empty p { margin: 0 0 16px; color: var(--ink-soft); }
 
 /* Plan drawer */
-.plan-fab { position: fixed; right: 20px; bottom: 20px; z-index: 20; box-shadow: 0 2px 8px rgba(0,0,0,.18); border-radius: 999px; padding: 12px 18px; }
-.plan { position: fixed; top: 0; right: 0; height: 100vh; width: min(440px, 100%); background: #FFFFFF; border-left: 1px solid var(--line); z-index: 30; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .2s ease; }
-@media (prefers-reduced-motion: reduce) { .plan { transition: none; } }
+.plan-fab { position: fixed; right: 24px; bottom: 24px; z-index: 20; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+.plan { position: fixed; top: 0; right: 0; height: 100vh; width: min(460px, 100%); background: #FFFFFF; z-index: 30; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .22s ease; box-shadow: -10px 0 30px rgba(0,0,0,.12); }
 .plan[data-open="true"] { transform: translateX(0); }
-.plan-head { padding: 18px 20px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
-.plan-head h2 { margin: 0; font-size: 20px; }
+.plan-head { padding: 22px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); }
+.plan-head h2 { margin: 0; font-size: 22px; }
 .plan-head .btn { margin-left: auto; }
-.plan-body { padding: 12px 20px; overflow-y: auto; flex: 1; }
-.plan-item { border-bottom: 1px solid var(--line); padding: 10px 0; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; }
-.plan-item .pi-name { font-weight: 700; font-size: 14px; }
-.plan-item .pi-id { font-size: 12px; color: var(--text-muted); }
-.plan-item .pi-controls { display: flex; gap: 8px; align-items: center; font-size: 13px; }
-.plan-item input[type=number] { width: 64px; padding: 4px; border: 1px solid #BBBBBB; border-radius: 4px; }
-.plan-item .pi-sub { text-align: right; font-weight: 700; }
-.plan-foot { border-top: 1px solid var(--line); padding: 16px 20px; background: var(--granicus-light-gray); }
-.plan-total { display: flex; justify-content: space-between; align-items: baseline; font-size: 18px; margin-bottom: 4px; }
-.plan-total strong { font-size: 26px; color: var(--granicus-dark-red); }
-.plan-note { font-size: 12px; color: var(--text-muted); margin: 0 0 12px; }
-.plan-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.plan-body { padding: 8px 24px; overflow-y: auto; flex: 1; }
+.plan-empty { color: var(--muted); padding: 20px 0; }
+.pi { display: grid; grid-template-columns: 1fr auto; gap: 4px 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.pi-name { font-weight: 700; font-size: 14px; line-height: 1.35; }
+.pi-meta { font-size: 12px; color: var(--muted); }
+.pi-sub { font-weight: 700; color: var(--red-dark); text-align: right; }
+.pi-ctl { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+.pi-ctl input { width: 64px; padding: 5px; border: 1px solid #CFCFCF; border-radius: 4px; }
+.plan-foot { padding: 20px 24px; background: var(--gray-light); }
+.plan-total { display: flex; align-items: baseline; justify-content: space-between; font-size: 17px; }
+.plan-total strong { font-size: 32px; color: var(--red-dark); }
+.plan-note { font-size: 13px; color: var(--muted); margin: 2px 0 14px; }
+.plan-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .scrim { position: fixed; inset: 0; background: rgba(28,28,28,.35); z-index: 25; display: none; }
 .scrim[data-open="true"] { display: block; }
 
 /* Footer */
-.site-footer { background: var(--granicus-light-gray); margin-top: 24px; }
-.footer-inner { max-width: 1320px; margin: 0 auto; padding: 28px 24px 90px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-@media (max-width: 720px) { .footer-inner { grid-template-columns: 1fr; } }
-.site-footer h2 { margin: 0 0 6px; font-size: 20px; }
-.site-footer p { margin: 0 0 8px; max-width: 70ch; }
-.fine { font-size: 12px; color: var(--text-muted); }
-.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--granicus-near-black); color: #FFFFFF; padding: 8px 14px; border-radius: 4px; font-size: 14px; z-index: 40; display: none; }
+.site-footer { position: relative; overflow: hidden; background: radial-gradient(circle at 100% 100%, var(--pink-1) 0 160px, var(--pink-2) 160px 280px, transparent 280px), var(--gray-light); }
+.footer-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 32px; padding-block: 48px 110px; }
+@media (max-width: 800px) { .footer-grid { grid-template-columns: 1fr; } }
+.site-footer h2 { font-size: 28px; margin: 0 0 8px; color: var(--ink-soft); }
+.site-footer p { margin: 0 0 18px; max-width: 60ch; color: var(--ink-soft); }
+.fine { font-size: 13px; color: var(--muted) !important; }
+.toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--ink); color: #FFFFFF; padding: 10px 18px; border-radius: 4px; font-size: 14px; z-index: 40; display: none; }
 </style>
 </head>
 <body>
 
 <header class="site-header">
-  <div class="header-inner">
-    <!-- Place the approved horizontal logo at assets/Granicus_Horizontal_OnWhite.png (see README). Hidden until the file exists. -->
+  <div class="wrap header-row">
+    <!-- Approved logo file goes in assets/ (see README). The image hides itself until the file exists. -->
     <img class="logo" src="assets/Granicus_Horizontal_OnWhite.png" alt="Granicus" onerror="this.remove()">
-    <div class="header-text">
-      <span class="kicker" id="kicker"></span>
-      <h1 id="page-title"></h1>
-    </div>
-    <div class="header-meta" id="header-meta"></div>
+    <span class="header-title" id="header-title"></span>
+    <a class="btn btn-red btn-sm" id="header-contact" href="#">Contact your Experience Partner</a>
   </div>
 </header>
 
-<section class="hero" aria-label="Search the catalog">
-  <div class="hero-inner">
-    <p class="intro" id="intro"></p>
-    <div class="search-row">
-      <div class="search-box">
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="eyebrow"></span></p>
+      <h1 id="title"></h1>
+      <p class="lede" id="lede"></p>
+      <p class="meta-line" id="meta-line"></p>
+      <div class="search" role="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
         <label for="q" class="sr-only">Search services</label>
-        <input id="q" type="search" autocomplete="off" placeholder="Search by name, ID, description, product, or credits">
+        <input id="q" type="search" autocomplete="off" placeholder="Search by service, ID, description, or credits">
       </div>
+      <details class="tips">
+        <summary>Search tips</summary>
+        <div class="tips-grid">
+          <code>"platform review"</code><span>Match an exact phrase</span>
+          <code>credits:&lt;=25</code><span>25 credits or fewer (also &lt;, &gt;, &gt;=)</span>
+          <code>credits:10-50</code><span>Between 10 and 50 credits</span>
+          <code>type:agency</code><span>Service type contains "agency"</span>
+          <code>product:cms</code><span>Product or edition contains "cms"</span>
+          <code>id:SC-</code><span>ID contains "SC-"</span>
+          <code>page:33</code><span>Listed on catalog page 33</span>
+          <code>-french</code><span>Leave out anything mentioning "french"</span>
+        </div>
+      </details>
     </div>
-    <p class="search-help">
-      Words must all match. Use quotes for a phrase: <code>"platform review"</code>.
-      Target a field: <code>credits:&lt;=25</code> <code>credits:10-50</code> <code>type:agency</code> <code>id:SC-</code> <code>product:legistar</code> <code>page:33</code>.
-      Exclude a word with a minus: <code>-french</code>.
-    </p>
-    <details class="getting-started">
-      <summary>How the catalog works</summary>
-      <div class="gs-body" id="getting-started"></div>
+    <div class="stats" id="stats" aria-label="Catalog at a glance"></div>
+  </div>
+</section>
+
+<section class="how">
+  <div class="wrap">
+    <details>
+      <summary>
+        <span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span>
+        <span>How the catalog works</span>
+        <span class="hint">Learning Library and Expert Led Services</span>
+      </summary>
+      <div class="how-grid" id="how"></div>
     </details>
   </div>
 </section>
 
-<div class="layout">
+<div class="wrap layout">
   <aside class="filters" id="filters" data-open="false" aria-label="Filters">
-    <button class="filter-toggle" id="filter-toggle" aria-expanded="false" aria-controls="filter-groups">Show filters</button>
-    <div class="filter-groups" id="filter-groups">
-      <div class="filter-group">
-        <h2>Products you have</h2>
-        <p class="hint">Pick the editions an agency owns. Cross-product services for that area are included unless you turn that off.</p>
-        <label class="check"><input type="checkbox" id="include-general" checked> <span>Include general services for the selected products' areas</span></label>
-        <div id="edition-filters"></div>
-      </div>
-      <div class="filter-group">
+    <button class="btn btn-ghost filter-toggle" id="filter-toggle" aria-expanded="false" aria-controls="filter-panel">Show filters</button>
+    <div class="filter-panel" id="filter-panel">
+      <div class="fgroup">
         <h2>Catalog section</h2>
-        <div id="section-filters"></div>
+        <p class="fhint">Check a section for everything in it, or open it to pick specific products.</p>
+        <div id="tree"></div>
       </div>
-      <div class="filter-group">
+      <div class="fgroup">
         <h2>Credits</h2>
         <div class="range">
           <label class="sr-only" for="min">Minimum credits</label>
@@ -239,39 +315,41 @@ table.svc tr.in-plan td { background: #FBF4F5; }
           <input id="max" type="number" min="0" inputmode="numeric" placeholder="Max">
         </div>
         <div class="presets" id="presets"></div>
-        <p class="hint" style="margin-top:10px">Scoping Required services</p>
+      </div>
+      <div class="fgroup">
+        <h2>Scoping Required services</h2>
         <select class="full" id="scoping" aria-label="Scoping Required services">
           <option value="include">Include</option>
-          <option value="exclude">Exclude</option>
+          <option value="exclude">Leave out</option>
           <option value="only">Show only these</option>
         </select>
       </div>
-      <div class="filter-group">
-        <h2>Pricing basis</h2>
-        <select class="full" id="learner" aria-label="Pricing basis">
+      <div class="fgroup">
+        <h2>Pricing</h2>
+        <select class="full" id="learner" aria-label="Pricing">
           <option value="any">Any</option>
-          <option value="per">Per learner only</option>
+          <option value="per">Per learner</option>
           <option value="flat">Not per learner</option>
         </select>
       </div>
-      <div class="filter-group">
+      <div class="fgroup">
         <h2>Service type</h2>
-        <div id="type-filters"></div>
+        <div id="types"></div>
       </div>
-      <div class="filter-group">
-        <label class="check"><input type="checkbox" id="dedupe"> <span>Show services listed in more than one section only once</span></label>
+      <div class="fgroup">
+        <label class="check"><input type="checkbox" id="dedupe"> <span>Show services listed in two sections only once</span></label>
       </div>
-      <div class="filter-group">
-        <button class="btn" id="reset" type="button">Clear all filters</button>
+      <div class="fgroup" style="border:0">
+        <button class="btn btn-ghost btn-sm" id="reset" type="button">Clear all filters</button>
       </div>
     </div>
   </aside>
 
-  <main id="main">
+  <main>
     <div class="results-bar">
-      <div class="results-count" aria-live="polite" id="count"></div>
+      <div class="count" aria-live="polite" id="count"></div>
       <div class="bar-actions">
-        <label for="sort" class="sr-only">Sort</label>
+        <label class="sr-only" for="sort">Sort</label>
         <select id="sort">
           <option value="catalog">Catalog order</option>
           <option value="credits-asc">Credits, low to high</option>
@@ -279,44 +357,44 @@ table.svc tr.in-plan td { background: #FBF4F5; }
           <option value="name">Name, A to Z</option>
           <option value="id">ID, A to Z</option>
         </select>
-        <label class="check" style="padding:0"><input type="checkbox" id="group" checked> <span>Group by section</span></label>
-        <button class="btn" type="button" id="copy-link">Copy link to this view</button>
-        <button class="btn" type="button" id="export">Download CSV</button>
+        <label class="switch"><input type="checkbox" id="group" checked> Group by section</label>
+        <button class="btn btn-ghost btn-sm" type="button" id="copy-link">Copy link</button>
+        <button class="btn btn-ghost btn-sm" type="button" id="export">Download CSV</button>
       </div>
     </div>
-    <div class="active-filters" id="active-filters"></div>
+    <div class="pills" id="pills"></div>
     <div id="results"></div>
   </main>
 </div>
 
 <footer class="site-footer">
-  <div class="footer-inner">
+  <div class="wrap footer-grid">
     <div>
       <h2 id="contact-heading"></h2>
       <p id="contact-text"></p>
-      <p><a id="contact-email" href="#"></a></p>
+      <a class="btn btn-red" id="contact-email" href="#"></a>
     </div>
     <div>
       <p class="fine" id="source-note"></p>
-      <p class="fine">Internal reference tool. Service names, descriptions, and credit values are reproduced from the catalog as published. Confirm availability and scope with the Experience Partner before committing credits.</p>
+      <p class="fine">Service names, descriptions, and credit values are reproduced from the published catalog. Confirm availability and scope with the Experience Partner before committing credits.</p>
     </div>
   </div>
 </footer>
 
-<button class="btn primary plan-fab" id="plan-open" type="button" aria-controls="plan">Credit plan (0)</button>
+<button class="btn btn-red plan-fab" id="plan-open" type="button" aria-controls="plan">Credit plan</button>
 <div class="scrim" id="scrim"></div>
 <aside class="plan" id="plan" data-open="false" aria-label="Credit plan" aria-hidden="true">
   <div class="plan-head">
     <h2>Credit plan</h2>
-    <button class="btn" type="button" id="plan-close">Close</button>
+    <button class="btn btn-ghost btn-sm" type="button" id="plan-close">Close</button>
   </div>
   <div class="plan-body" id="plan-body"></div>
   <div class="plan-foot">
     <div class="plan-total"><span>Total credits</span><strong id="plan-total">0</strong></div>
     <p class="plan-note" id="plan-note"></p>
     <div class="plan-actions">
-      <button class="btn primary" type="button" id="plan-copy">Copy plan as text</button>
-      <button class="btn" type="button" id="plan-clear">Clear plan</button>
+      <button class="btn btn-red btn-sm" type="button" id="plan-copy">Copy plan as text</button>
+      <button class="btn btn-ghost btn-sm" type="button" id="plan-clear">Clear plan</button>
     </div>
   </div>
 </aside>
@@ -329,11 +407,14 @@ table.svc tr.in-plan td { background: #FBF4F5; }
   const C = window.CATALOG;
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const tint = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+  const GENERAL = "General";
+  const GENERAL_LABEL = "Services for all products";
 
-  /* ---------- Derived fields (rules documented in README) ---------- */
+  /* ---------- Data preparation ---------- */
   const SECTION = Object.fromEntries(C.sections.map((s) => [s.key, s]));
 
-  function editionOf(id, name) {
+  function productOf(id, name) {
     if (/PCL Enterprise/.test(name)) return "PCL Enterprise";
     if (/PCL Enhanced/.test(name)) return "PCL Enhanced";
     if (/^RRM Enhanced/.test(name)) return "RRM Enhanced";
@@ -341,329 +422,290 @@ table.svc tr.in-plan td { background: #FBF4F5; }
     if (/^Agenda LE/.test(name)) return "Agenda LE";
     if (/^Agenda OE/.test(name)) return "Agenda OE";
     if (/^Agenda PE/.test(name)) return "Agenda PE";
-    const prefix = id.split("-")[0];
     const map = {
       CMSO: "CMS OE", CMSV: "CMS VE", STFE: "Sentiment & Feedback", FWOE: "Forms & Workflow OE",
       RRMA: "Records Request ATIP", SRMEN: "SRM Enhanced", SRMES: "SRM Essentials", SRMEE: "SRM E&E",
       AGOM: "Agenda OE", AGLE: "Agenda LE", AGPE: "Agenda PE", MMVC: "Votecast", VIDS: "Live Manager",
       BOCO: "B&C", PCLH: "PCL Enhanced", PCLT: "PCL Enterprise"
     };
-    return map[prefix] || "General";
+    return map[id.split("-")[0]] || GENERAL;
   }
 
-  // Other names for an edition, each taken from the catalog's own text.
-  const ALIASES = {
-    "CMS OE": "OpenCities",
-    "Agenda OE": "OneMeeting",
-    "Agenda LE": "Legistar MediaManager",
-    "Agenda PE": "Peak Legislate",
-    "RRM Enhanced": "GovQA",
-    "Records Request ATIP": "AMANDA",
-    "PCL Enterprise": "AMANDA",
-    "Sentiment & Feedback": "EngagementHQ"
+  // Legacy product names, searchable but never displayed. Each pairing is stated in the catalog text.
+  const LEGACY = {
+    "CMS OE": "opencities", "Agenda OE": "onemeeting", "Agenda LE": "legistar mediamanager",
+    "Agenda PE": "peak legislate", "RRM Enhanced": "govqa", "Records Request ATIP": "amanda",
+    "PCL Enterprise": "amanda", "Sentiment & Feedback": "engagementhq"
   };
 
   const services = [];
-  C.sections.forEach((sec) => {
-    (C.rows[sec.key] || []).forEach((r) => {
-      const [page, id, name, type, credits, desc] = r;
-      const edition = editionOf(id, name);
-      services.push({
-        idx: services.length, page, id, name, type, credits, desc,
-        section: sec.key, edition,
-        scoping: credits === null,
-        perLearner: /pric(e|ing) is per learner/i.test(desc)
-      });
+  C.sections.forEach((sec) => (C.rows[sec.key] || []).forEach(([page, id, name, type, credits, desc]) => {
+    services.push({
+      idx: services.length, page, id, name, type, credits, desc, section: sec.key,
+      product: productOf(id, name), scoping: credits === null,
+      perLearner: /pric(e|ing) is per learner/i.test(desc)
     });
-  });
+  }));
   const byId = {};
-  services.forEach((s) => { (byId[s.id] = byId[s.id] || []).push(s); });
+  services.forEach((s) => (byId[s.id] = byId[s.id] || []).push(s));
   services.forEach((s) => {
-    s.otherSections = byId[s.id].filter((o) => o !== s).map((o) => SECTION[o.section].name);
-    s.hay = [
-      s.id, s.id.replace(/-/g, ""), s.name, SECTION[s.section].name, s.type, s.edition,
-      ALIASES[s.edition] || "", s.desc, s.scoping ? "scoping required" : s.credits + " credits",
-      s.perLearner ? "per learner" : "", "page " + s.page
-    ].join(" \u0001 ").toLowerCase();
+    s.leaf = s.section + "::" + s.product;
+    s.others = byId[s.id].filter((o) => o !== s).map((o) => SECTION[o.section].name);
+    s.hay = [s.id, s.id.replace(/-/g, ""), s.name, SECTION[s.section].name, s.type, s.product, LEGACY[s.product] || "",
+      s.desc, s.scoping ? "scoping required" : s.credits + " credits", s.perLearner ? "per learner" : ""].join(" \u0001 ").toLowerCase();
   });
 
-  const EDITION_ORDER = [];
-  const editionSections = {};
-  services.forEach((s) => {
-    if (s.edition === "General") return;
-    if (!editionSections[s.edition]) { editionSections[s.edition] = new Set(); EDITION_ORDER.push(s.edition); }
-    editionSections[s.edition].add(s.section);
+  // Section -> ordered product leaves (General last)
+  const TREE = C.sections.map((sec) => {
+    const items = services.filter((s) => s.section === sec.key);
+    const products = [];
+    items.forEach((s) => { if (s.product !== GENERAL && !products.includes(s.product)) products.push(s.product); });
+    if (items.some((s) => s.product === GENERAL)) products.push(GENERAL);
+    return {
+      sec, count: items.length,
+      leaves: products.map((p) => ({ key: sec.key + "::" + p, label: p === GENERAL ? GENERAL_LABEL : p, count: items.filter((s) => s.product === p).length })),
+      nested: products.some((p) => p !== GENERAL)
+    };
   });
+  const ALL_LEAVES = new Set(TREE.flatMap((t) => t.leaves.map((l) => l.key)));
   const TYPES = [...new Set(services.map((s) => s.type))];
 
   /* ---------- State ---------- */
-  const state = {
-    q: "", sections: new Set(), editions: new Set(), types: new Set(),
-    includeGeneral: true, min: "", max: "", scoping: "include", learner: "any",
-    sort: "catalog", group: true, dedupe: false
-  };
-  const plan = new Map(); // idx -> quantity
+  const state = { q: "", leaves: new Set(), types: new Set(), min: "", max: "", scoping: "include", learner: "any", sort: "catalog", group: true, dedupe: false };
+  const expanded = new Set();
+  const plan = new Map();
 
   /* ---------- Static content ---------- */
   function renderStatic() {
     const m = C.meta;
-    $("kicker").textContent = m.title;
-    $("page-title").textContent = m.subtitle;
-    $("header-meta").innerHTML = `Version ${esc(m.version)}<br>Published ${esc(m.published)} | ${esc(m.region)}`;
-    $("intro").textContent = m.intro;
-    const gs = m.gettingStarted;
-    $("getting-started").innerHTML =
-      `<div><p>${esc(gs.summary)}</p><p>${esc(gs.partner)}</p><p><strong>${esc(gs.closing)}</strong></p></div>` +
-      gs.options.map((o) => `<div class="gs-option"><strong>${esc(o.name)}</strong>${esc(o.text)}</div>`).join("");
+    $("header-title").textContent = m.subtitle;
+    $("eyebrow").textContent = m.title;
+    $("title").textContent = m.subtitle;
+    $("lede").textContent = m.intro;
+    $("meta-line").textContent = `Version ${m.version} | Published ${m.published} | ${m.region}`;
+    $("header-contact").href = "mailto:" + m.contact.email;
     $("contact-heading").textContent = m.contact.heading;
     $("contact-text").textContent = m.contact.text;
     $("contact-email").textContent = m.contact.email;
     $("contact-email").href = "mailto:" + m.contact.email;
-    $("source-note").textContent = `Source: ${m.title} - ${m.subtitle} | Version ${m.version} | Published: ${m.published} | ${m.region}. ${services.length} listings.`;
+    $("source-note").textContent = `Source: ${m.title} - ${m.subtitle} | Version ${m.version} | Published: ${m.published} | ${m.region}.`;
+
+    const priced = services.filter((s) => !s.scoping).map((s) => s.credits);
+    const stats = [
+      ["Browse the catalog", `<strong>${Object.keys(byId).length}</strong> services`],
+      ["Across every solution", `<strong>${C.sections.length}</strong> catalog sections`],
+      ["Fit any credit balance", `<strong>${Math.min(...priced)}</strong> to <strong>${Math.max(...priced).toLocaleString()}</strong> credits`]
+    ];
+    $("stats").innerHTML = stats.map(([h, b]) => `<div class="stat"><div class="stat-head">${h}</div><div class="stat-body">${b}</div></div>`).join("");
+
+    const g = m.gettingStarted;
+    const icons = [
+      `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="9" width="34" height="24" rx="2"/><path d="M3 37h42"/><circle cx="24" cy="21" r="7"/><path d="m22 18 5 3-5 3z" fill="currentColor"/></svg>`,
+      `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><circle cx="24" cy="26" r="6"/><path d="M13 44c1-7 5-11 11-11s10 4 11 11"/><path d="m12 7 1.6 3.3 3.6.5-2.6 2.5.6 3.6L12 15.2 8.8 16.9l.6-3.6-2.6-2.5 3.6-.5zM24 3l1.6 3.3 3.6.5-2.6 2.5.6 3.6L24 11.2l-3.2 1.7.6-3.6-2.6-2.5 3.6-.5zM36 7l1.6 3.3 3.6.5-2.6 2.5.6 3.6L36 15.2l-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z"/></svg>`
+    ];
+    $("how").innerHTML = `<div><p>${esc(g.summary)}</p><p>${esc(g.partner)}</p><p><strong>${esc(g.closing)}</strong></p></div>` +
+      g.options.map((o, i) => `<div class="option">${icons[i] || ""}<h3>${esc(o.name)}</h3><p>${esc(o.text)}</p></div>`).join("");
   }
 
-  function checkbox(group, value, label, count, swatch) {
-    const sw = swatch ? `<span class="swatch" style="background:${swatch}"></span>` : "";
-    return `<label class="check">${sw}<input type="checkbox" data-group="${group}" value="${esc(value)}"> <span>${esc(label)}</span><span class="count">${count}</span></label>`;
+  function renderControls() {
+    const chev = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>`;
+    $("tree").innerHTML = TREE.map((t) => `
+      <div class="tree-sec">
+        <div class="tree-row">
+          ${t.nested ? `<button type="button" class="twisty" data-twisty="${t.sec.key}" aria-expanded="false" aria-controls="kids-${t.sec.key}" aria-label="Show products in ${esc(t.sec.name)}">${chev}</button>` : `<span class="twisty-spacer"></span>`}
+          <label class="check"><input type="checkbox" data-sec="${t.sec.key}"><span class="dot" style="background:${t.sec.color}"></span><span>${esc(t.sec.name)}</span><span class="count">${t.count}</span></label>
+        </div>
+        ${t.nested ? `<div class="tree-kids" id="kids-${t.sec.key}" hidden>${t.leaves.map((l) =>
+          `<label class="check"><input type="checkbox" data-leaf="${esc(l.key)}"><span>${esc(l.label)}</span><span class="count">${l.count}</span></label>`).join("")}</div>` : ""}
+      </div>`).join("");
+
+    $("types").innerHTML = TYPES.map((ty) =>
+      `<label class="check"><input type="checkbox" data-type="${esc(ty)}"><span>${esc(ty)}</span><span class="count">${services.filter((s) => s.type === ty).length}</span></label>`).join("");
+
+    $("presets").innerHTML = [["Up to 10", "", "10"], ["Up to 25", "", "25"], ["Up to 50", "", "50"], ["51 to 100", "51", "100"], ["Over 100", "101", ""]]
+      .map(([l, a, b]) => `<button type="button" class="chip" data-min="${a}" data-max="${b}">${l}</button>`).join("");
   }
 
-  function renderFilterControls() {
-    // Editions grouped by the section they appear in
-    let html = "";
-    C.sections.forEach((sec) => {
-      const eds = EDITION_ORDER.filter((e) => editionSections[e].has(sec.key));
-      if (!eds.length) return;
-      html += `<div class="edition-group-label">${esc(sec.name)}</div>`;
-      eds.forEach((e) => {
-        const n = services.filter((s) => s.edition === e).length;
-        const alias = ALIASES[e] ? ` (${ALIASES[e].split(" ")[0]})` : "";
-        html += checkbox("editions", e, e + alias, n);
-      });
+  function syncControls() {
+    $("q").value = state.q;
+    TREE.forEach((t) => {
+      const sel = t.leaves.filter((l) => state.leaves.has(l.key)).length;
+      const box = document.querySelector(`[data-sec="${t.sec.key}"]`);
+      box.checked = sel === t.leaves.length; box.indeterminate = sel > 0 && sel < t.leaves.length;
+      if (sel > 0 && sel < t.leaves.length) expanded.add(t.sec.key);
+      const kids = $("kids-" + t.sec.key), tw = document.querySelector(`[data-twisty="${t.sec.key}"]`);
+      if (kids) { kids.hidden = !expanded.has(t.sec.key); tw.setAttribute("aria-expanded", expanded.has(t.sec.key)); }
     });
-    const secsWithoutEditions = C.sections.filter((sec) => !EDITION_ORDER.some((e) => editionSections[e].has(sec.key)));
-    if (secsWithoutEditions.length) {
-      html += `<p class="hint" style="margin-top:10px">${esc(secsWithoutEditions.map((s) => s.name).join(", "))} list no edition-specific services; use Catalog section.</p>`;
-    }
-    $("edition-filters").innerHTML = html;
-
-    $("section-filters").innerHTML = C.sections.map((sec) =>
-      checkbox("sections", sec.key, sec.name, services.filter((s) => s.section === sec.key).length, sec.color)).join("");
-
-    $("type-filters").innerHTML = TYPES.map((t) =>
-      checkbox("types", t, t, services.filter((s) => s.type === t).length)).join("");
-
-    $("presets").innerHTML = [["Up to 10", "", 10], ["Up to 25", "", 25], ["Up to 50", "", 50], ["51 to 100", 51, 100], ["Over 100", 101, ""]]
-      .map(([l, a, b]) => `<button type="button" class="chip-btn" data-min="${a}" data-max="${b}">${l}</button>`).join("");
+    document.querySelectorAll("[data-leaf]").forEach((el) => { el.checked = state.leaves.has(el.dataset.leaf); });
+    document.querySelectorAll("[data-type]").forEach((el) => { el.checked = state.types.has(el.dataset.type); });
+    $("min").value = state.min; $("max").value = state.max;
+    document.querySelectorAll("[data-min]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.min === state.min && b.dataset.max === state.max && (state.min || state.max) ? "true" : "false"));
+    $("scoping").value = state.scoping; $("learner").value = state.learner;
+    $("sort").value = state.sort; $("group").checked = state.group; $("dedupe").checked = state.dedupe;
   }
 
-  /* ---------- Query parsing ---------- */
+  /* ---------- Search ---------- */
   function parseQuery(q) {
-    const terms = [];
-    const re = /(-?)(?:(\w+):)?(?:"([^"]*)"|(\S+))/g;
+    const out = [], re = /(-?)(?:(\w+):)?(?:"([^"]*)"|(\S+))/g;
     let m;
     while ((m = re.exec(q)) !== null) {
-      const neg = m[1] === "-";
-      const field = m[2] ? m[2].toLowerCase() : null;
-      const value = (m[3] !== undefined ? m[3] : m[4] || "").trim();
-      if (!value) continue;
-      terms.push({ neg, field, value: value.toLowerCase() });
+      const v = (m[3] !== undefined ? m[3] : m[4] || "").trim().toLowerCase();
+      if (v) out.push({ neg: m[1] === "-", field: m[2] ? m[2].toLowerCase() : null, v });
     }
-    return terms;
+    return out;
   }
-
-  function creditTest(expr) {
+  function creditTest(e) {
     let m;
-    if ((m = expr.match(/^(\d+)\s*-\s*(\d+)$/))) { const a = +m[1], b = +m[2]; return (c) => c !== null && c >= a && c <= b; }
-    if ((m = expr.match(/^(<=|>=|<|>|=)?\s*(\d+)$/))) {
-      const n = +m[2];
-      const op = m[1] || "=";
-      return (c) => c !== null && ({ "<": c < n, "<=": c <= n, ">": c > n, ">=": c >= n, "=": c === n })[op];
-    }
-    if (/^scop/.test(expr)) return (c) => c === null;
+    if ((m = e.match(/^(\d+)\s*-\s*(\d+)$/))) return (c) => c !== null && c >= +m[1] && c <= +m[2];
+    if ((m = e.match(/^(<=|>=|<|>|=)?\s*(\d+)$/))) { const n = +m[2], op = m[1] || "="; return (c) => c !== null && { "<": c < n, "<=": c <= n, ">": c > n, ">=": c >= n, "=": c === n }[op]; }
+    if (/^scop/.test(e)) return (c) => c === null;
     return () => false;
   }
-
-  function termMatches(s, t) {
-    const v = t.value;
+  function match(s, t) {
     switch (t.field) {
-      case "credits": case "credit": case "c": return creditTest(v)(s.credits);
-      case "id": return s.id.toLowerCase().includes(v) || s.id.replace(/-/g, "").toLowerCase().includes(v.replace(/-/g, ""));
-      case "name": return s.name.toLowerCase().includes(v);
-      case "type": return s.type.toLowerCase().includes(v);
-      case "section": return SECTION[s.section].name.toLowerCase().includes(v);
-      case "product": case "edition": return (s.edition + " " + (ALIASES[s.edition] || "")).toLowerCase().includes(v);
-      case "desc": case "description": return s.desc.toLowerCase().includes(v);
-      case "page": return String(s.page) === v;
-      default: return s.hay.includes(t.field ? t.field + ":" + v : v);
+      case "credits": case "credit": case "c": return creditTest(t.v)(s.credits);
+      case "id": return s.id.toLowerCase().includes(t.v) || s.id.replace(/-/g, "").toLowerCase().includes(t.v.replace(/-/g, ""));
+      case "name": return s.name.toLowerCase().includes(t.v);
+      case "type": return s.type.toLowerCase().includes(t.v);
+      case "section": return SECTION[s.section].name.toLowerCase().includes(t.v);
+      case "product": case "edition": return (s.product + " " + (LEGACY[s.product] || "")).toLowerCase().includes(t.v);
+      case "desc": case "description": return s.desc.toLowerCase().includes(t.v);
+      case "page": return String(s.page) === t.v;
+      default: return s.hay.includes(t.field ? t.field + ":" + t.v : t.v);
     }
   }
 
-  /* ---------- Filtering ---------- */
   function filtered() {
     const terms = parseQuery(state.q);
-    const min = state.min === "" ? null : Number(state.min);
-    const max = state.max === "" ? null : Number(state.max);
-    const editionAreas = new Set();
-    state.editions.forEach((e) => editionSections[e] && editionSections[e].forEach((k) => editionAreas.add(k)));
+    const min = state.min === "" ? null : +state.min, max = state.max === "" ? null : +state.max;
     const seen = new Set();
-
     let list = services.filter((s) => {
-      if (state.sections.size && !state.sections.has(s.section)) return false;
-      if (state.editions.size) {
-        const ok = state.editions.has(s.edition) ||
-          (state.includeGeneral && s.edition === "General" && editionAreas.has(s.section));
-        if (!ok) return false;
-      }
+      if (state.leaves.size && !state.leaves.has(s.leaf)) return false;
       if (state.types.size && !state.types.has(s.type)) return false;
       if (state.learner === "per" && !s.perLearner) return false;
       if (state.learner === "flat" && s.perLearner) return false;
-      if (s.scoping) {
-        if (state.scoping === "exclude") return false;
-      } else {
+      if (s.scoping) { if (state.scoping === "exclude") return false; }
+      else {
         if (state.scoping === "only") return false;
         if (min !== null && s.credits < min) return false;
         if (max !== null && s.credits > max) return false;
       }
-      for (const t of terms) {
-        const hit = termMatches(s, t);
-        if (t.neg ? hit : !hit) return false;
-      }
-      return true;
+      return terms.every((t) => (t.neg ? !match(s, t) : match(s, t)));
     });
-
-    if (state.dedupe) {
-      list = list.filter((s) => (seen.has(s.id) ? false : (seen.add(s.id), true)));
-    }
-
-    const cred = (s, hi) => (s.scoping ? (hi ? -1 : Infinity) : s.credits);
+    if (state.dedupe) list = list.filter((s) => (seen.has(s.id) ? false : seen.add(s.id)));
+    const cr = (s, hi) => (s.scoping ? (hi ? -1 : Infinity) : s.credits);
     const sorters = {
       catalog: (a, b) => a.idx - b.idx,
-      "credits-asc": (a, b) => cred(a, false) - cred(b, false) || a.idx - b.idx,
-      "credits-desc": (a, b) => cred(b, true) - cred(a, true) || a.idx - b.idx,
+      "credits-asc": (a, b) => cr(a) - cr(b) || a.idx - b.idx,
+      "credits-desc": (a, b) => cr(b, true) - cr(a, true) || a.idx - b.idx,
       name: (a, b) => a.name.localeCompare(b.name),
       id: (a, b) => a.id.localeCompare(b.id)
     };
-    return list.sort(sorters[state.sort]);
+    return list.sort(sorters[state.sort] || sorters.catalog);
   }
 
   /* ---------- Rendering ---------- */
-  function row(s, showSection) {
-    const inPlan = plan.has(s.idx);
-    const tags = [
-      showSection ? `<span class="tag" style="border-left:4px solid ${SECTION[s.section].color}">${esc(SECTION[s.section].name)}</span>` : "",
-      `<span class="tag">${esc(s.type)}</span>`,
-      s.edition !== "General" ? `<span class="tag edition">${esc(s.edition)}</span>` : "",
-      s.perLearner ? `<span class="tag learner">Per learner</span>` : "",
-      s.otherSections.length ? `<span class="tag dup" title="Same ID also listed in: ${esc(s.otherSections.join(", "))}">Also in ${esc(s.otherSections.join(", "))}</span>` : ""
-    ].join("");
+  function card(s, showSection) {
+    const sec = SECTION[s.section], inPlan = plan.has(s.idx);
     const long = s.desc.length > 260 || s.desc.split("\n").length > 3;
-    const credits = s.scoping
-      ? `<span class="credits-scope">Scoping Required</span>`
-      : `<span class="credits-num">${s.credits.toLocaleString()}</span><span class="credits-unit">${s.perLearner ? "credits per learner" : "credits"}</span>`;
-    return `<tr class="${inPlan ? "in-plan" : ""}">
-      <td class="col-id">${esc(s.id)}<br><span class="page-ref">p. ${s.page}</span></td>
-      <td>
-        <p class="svc-name">${esc(s.name)}</p>
+    const tags = [
+      showSection ? `<span class="tag sec"><i style="background:${sec.color}"></i>${esc(sec.name)}</span>` : "",
+      s.product !== GENERAL ? `<span class="tag product">${esc(s.product)}</span>` : "",
+      `<span class="tag">${esc(s.type)}</span>`,
+      s.perLearner ? `<span class="tag learner">Per learner</span>` : "",
+      s.others.length ? `<span class="tag dup">Also in ${esc(s.others.join(", "))}</span>` : ""
+    ].join("");
+    const credit = s.scoping
+      ? `<span class="credit-scope">Scoping Required</span>`
+      : `<span class="credit-num">${s.credits.toLocaleString()}</span><span class="credit-unit">${s.perLearner ? "credits per learner" : "credits"}</span>`;
+    return `<article class="svc${inPlan ? " in-plan" : ""}" data-card="${s.idx}">
+      <div>
+        <div class="svc-top"><span class="svc-id">${esc(s.id)}</span><span>Catalog page ${s.page}</span></div>
+        <h3>${esc(s.name)}</h3>
         <div class="tags">${tags}</div>
         <p class="desc${long ? " clamp" : ""}" id="d${s.idx}">${esc(s.desc)}</p>
-        ${long ? `<button type="button" class="link-btn" data-expand="${s.idx}" aria-expanded="false" aria-controls="d${s.idx}">Show full description</button>` : ""}
-      </td>
-      <td class="col-credits">${credits}</td>
-      <td class="col-add"><button type="button" class="add-btn" data-add="${s.idx}" aria-pressed="${inPlan}">${inPlan ? "In plan" : "Add"}</button></td>
-    </tr>`;
-  }
-
-  function table(list, showSection) {
-    return `<table class="svc"><thead><tr><th>ID</th><th>Service</th><th style="text-align:right">Credits</th><th><span class="sr-only">Plan</span></th></tr></thead><tbody>${list.map((s) => row(s, showSection)).join("")}</tbody></table>`;
+        ${long ? `<button type="button" class="link-btn" data-expand="${s.idx}" aria-expanded="false" aria-controls="d${s.idx}">Read full description</button>` : ""}
+      </div>
+      <div class="svc-side">
+        <div class="credit-box">${credit}</div>
+        <button type="button" class="btn btn-ghost btn-sm add" data-add="${s.idx}" aria-pressed="${inPlan}">${inPlan ? "Added" : "Add to plan"}</button>
+      </div>
+    </article>`;
   }
 
   function render() {
     const list = filtered();
     const total = state.dedupe ? Object.keys(byId).length : services.length;
-    $("count").innerHTML = `<strong>${list.length}</strong> of ${total} services`;
-
+    $("count").innerHTML = `<strong>${list.length}</strong>of ${total} listings`;
     if (!list.length) {
-      $("results").innerHTML = `<div class="empty"><p>No services match these filters.</p><button class="btn" type="button" data-action="reset">Clear all filters</button></div>`;
+      $("results").innerHTML = `<div class="empty"><h2>No services match</h2><p>Try fewer words or a wider credit range.</p><button class="btn btn-red btn-sm" type="button" data-action="reset">Clear all filters</button></div>`;
     } else if (state.group) {
       $("results").innerHTML = C.sections.map((sec) => {
         const items = list.filter((s) => s.section === sec.key);
         if (!items.length) return "";
-        return `<section class="section-block" style="--accent:${sec.color}">
-          <div class="section-head"><h2>${esc(sec.name)}</h2><p>${esc(sec.tagline)}</p></div>
-          ${table(items, false)}</section>`;
+        return `<section class="sec-block" style="--accent:${sec.color};--tint:${tint(sec.color, 0.09)}">
+          <div class="sec-head"><span class="ring" aria-hidden="true"></span><div><h2>${esc(sec.name)}</h2><p>${esc(sec.tagline)}</p></div><span class="sec-count">${items.length} shown</span></div>
+          ${items.map((s) => card(s, false)).join("")}</section>`;
       }).join("");
     } else {
-      $("results").innerHTML = table(list, true);
+      $("results").innerHTML = list.map((s) => card(s, true)).join("");
     }
-    renderActive();
-    syncUrl();
+    renderPills(); syncUrl();
   }
 
-  function renderActive() {
+  function renderPills() {
     const pills = [];
     if (state.q) pills.push(["q", "", `Search: ${state.q}`]);
-    state.editions.forEach((e) => pills.push(["editions", e, e]));
-    state.sections.forEach((k) => pills.push(["sections", k, SECTION[k].name]));
-    state.types.forEach((t) => pills.push(["types", t, t]));
-    if (state.min !== "" || state.max !== "") pills.push(["range", "", `Credits ${state.min || 0} to ${state.max || "any"}`]);
+    TREE.forEach((t) => {
+      const sel = t.leaves.filter((l) => state.leaves.has(l.key));
+      if (!sel.length) return;
+      if (sel.length === t.leaves.length) pills.push(["sec", t.sec.key, t.sec.name]);
+      else sel.forEach((l) => pills.push(["leaf", l.key, `${t.sec.name}: ${l.label}`]));
+    });
+    state.types.forEach((ty) => pills.push(["type", ty, ty]));
+    if (state.min !== "" || state.max !== "") pills.push(["range", "", state.max === "" ? `${state.min}+ credits` : `${state.min || 0} to ${state.max} credits`]);
     if (state.scoping !== "include") pills.push(["scoping", "", state.scoping === "only" ? "Scoping Required only" : "No Scoping Required"]);
     if (state.learner !== "any") pills.push(["learner", "", state.learner === "per" ? "Per learner" : "Not per learner"]);
-    $("active-filters").innerHTML = pills.map(([g, v, l]) =>
-      `<button type="button" class="pill" data-clear="${g}" data-value="${esc(v)}" aria-label="Remove filter ${esc(l)}">${esc(l)}</button>`).join("");
+    $("pills").innerHTML = pills.map(([g, v, l]) => `<button type="button" class="pill" data-clear="${g}" data-value="${esc(v)}">${esc(l)} <span aria-hidden="true">×</span><span class="sr-only">Remove</span></button>`).join("");
   }
 
   /* ---------- Plan ---------- */
+  const lineCredits = (idx, qty) => { const s = services[idx]; return s.scoping ? 0 : s.credits * (s.perLearner ? qty : 1); };
   function renderPlan() {
-    let total = 0, scopeCount = 0;
-    const items = [...plan.entries()].map(([idx, qty]) => {
-      const s = services[idx];
-      let sub = "Scoping Required";
-      if (!s.scoping) { const v = s.credits * (s.perLearner ? qty : 1); total += v; sub = v.toLocaleString(); }
-      else scopeCount++;
-      const qtyControl = s.perLearner
-        ? `<label>Learners <input type="number" min="1" value="${qty}" data-qty="${idx}"></label>`
-        : "";
-      return `<div class="plan-item">
-        <div><div class="pi-name">${esc(s.name)}</div><div class="pi-id">${esc(s.id)} | ${esc(SECTION[s.section].name)}</div></div>
-        <div class="pi-sub">${sub}</div>
-        <div class="pi-controls">${qtyControl}<button type="button" class="link-btn" data-remove="${idx}">Remove</button></div>
+    let total = 0, scoped = 0;
+    const rows = [...plan].map(([idx, qty]) => {
+      const s = services[idx], v = lineCredits(idx, qty); total += v; if (s.scoping) scoped++;
+      return `<div class="pi">
+        <div><div class="pi-name">${esc(s.name)}</div><div class="pi-meta">${esc(s.id)} | ${esc(SECTION[s.section].name)}</div></div>
+        <div class="pi-sub">${s.scoping ? "Scoping Required" : v.toLocaleString()}</div>
+        <div class="pi-ctl">${s.perLearner ? `<label>Learners <input type="number" min="1" value="${qty}" data-qty="${idx}"></label>` : ""}<button type="button" class="link-btn" data-remove="${idx}">Remove</button></div>
       </div>`;
     });
-    $("plan-body").innerHTML = items.length ? items.join("") : `<p>Add services from the list to total their credits.</p>`;
+    $("plan-body").innerHTML = rows.length ? rows.join("") : `<p class="plan-empty">Add services from the catalog to total their credits.</p>`;
     $("plan-total").textContent = total.toLocaleString();
-    $("plan-note").textContent = scopeCount
-      ? `${scopeCount} Scoping Required service${scopeCount > 1 ? "s are" : " is"} not included in the total.`
-      : "Per-learner services multiply by the learner count.";
-    $("plan-open").textContent = `Credit plan (${plan.size}) | ${total.toLocaleString()} credits`;
+    $("plan-note").textContent = scoped ? `${scoped} Scoping Required service${scoped > 1 ? "s aren't" : " isn't"} counted in the total.` : "Per-learner services multiply by the number of learners.";
+    $("plan-open").textContent = plan.size ? `Credit plan: ${plan.size} | ${total.toLocaleString()} credits` : "Credit plan";
   }
-
   function planText() {
-    const lines = [...plan.entries()].map(([idx, qty]) => {
+    const lines = [...plan].map(([idx, qty]) => {
       const s = services[idx];
       if (s.scoping) return `${s.id} | ${s.name} | Scoping Required`;
-      const v = s.credits * (s.perLearner ? qty : 1);
-      return `${s.id} | ${s.name} | ${s.perLearner ? `${s.credits} x ${qty} learners = ${v}` : v} credits`;
+      return `${s.id} | ${s.name} | ${s.perLearner ? `${s.credits} x ${qty} learners = ${lineCredits(idx, qty)}` : s.credits} credits`;
     });
-    const total = [...plan.entries()].reduce((a, [idx, qty]) => {
-      const s = services[idx]; return a + (s.scoping ? 0 : s.credits * (s.perLearner ? qty : 1));
-    }, 0);
-    return lines.join("\n") + `\n\nTotal: ${total} credits\nSource: ${C.meta.title}, Version ${C.meta.version}`;
+    const total = [...plan].reduce((a, [i, q]) => a + lineCredits(i, q), 0);
+    return `${lines.join("\n")}\n\nTotal: ${total} credits\nSource: ${C.meta.title}, Version ${C.meta.version}`;
   }
-
   function togglePlan(open) {
-    $("plan").dataset.open = open; $("scrim").dataset.open = open;
-    $("plan").setAttribute("aria-hidden", String(!open));
-    if (open) $("plan-close").focus();
+    $("plan").dataset.open = open; $("scrim").dataset.open = open; $("plan").setAttribute("aria-hidden", String(!open));
+    if (open) $("plan-close").focus(); else $("plan-open").focus();
   }
 
-  /* ---------- URL state ---------- */
+  /* ---------- URL ---------- */
   function syncUrl() {
     const p = new URLSearchParams();
     if (state.q) p.set("q", state.q);
-    if (state.sections.size) p.set("sec", [...state.sections].join(","));
-    if (state.editions.size) p.set("ed", [...state.editions].join("|"));
+    if (state.leaves.size) p.set("f", [...state.leaves].join("|"));
     if (state.types.size) p.set("ty", [...state.types].join("|"));
-    if (!state.includeGeneral) p.set("gen", "0");
     if (state.min !== "") p.set("min", state.min);
     if (state.max !== "") p.set("max", state.max);
     if (state.scoping !== "include") p.set("sc", state.scoping);
@@ -674,14 +716,11 @@ table.svc tr.in-plan td { background: #FBF4F5; }
     const qs = p.toString();
     history.replaceState(null, "", qs ? "?" + qs : location.pathname);
   }
-
   function loadUrl() {
     const p = new URLSearchParams(location.search);
     state.q = p.get("q") || "";
-    (p.get("sec") || "").split(",").filter((k) => SECTION[k]).forEach((k) => state.sections.add(k));
-    (p.get("ed") || "").split("|").filter((e) => editionSections[e]).forEach((e) => state.editions.add(e));
+    (p.get("f") || "").split("|").filter((k) => ALL_LEAVES.has(k)).forEach((k) => state.leaves.add(k));
     (p.get("ty") || "").split("|").filter((t) => TYPES.includes(t)).forEach((t) => state.types.add(t));
-    state.includeGeneral = p.get("gen") !== "0";
     state.min = p.get("min") || ""; state.max = p.get("max") || "";
     state.scoping = ["include", "exclude", "only"].includes(p.get("sc")) ? p.get("sc") : "include";
     state.learner = ["any", "per", "flat"].includes(p.get("pl")) ? p.get("pl") : "any";
@@ -690,115 +729,94 @@ table.svc tr.in-plan td { background: #FBF4F5; }
     state.dedupe = p.get("dd") === "1";
   }
 
-  function pushStateToControls() {
-    $("q").value = state.q;
-    document.querySelectorAll("input[data-group]").forEach((el) => { el.checked = state[el.dataset.group].has(el.value); });
-    $("include-general").checked = state.includeGeneral;
-    $("min").value = state.min; $("max").value = state.max;
-    $("scoping").value = state.scoping; $("learner").value = state.learner;
-    $("sort").value = state.sort; $("group").checked = state.group; $("dedupe").checked = state.dedupe;
-  }
-
+  /* ---------- Helpers ---------- */
   function resetAll() {
-    state.q = ""; state.sections.clear(); state.editions.clear(); state.types.clear();
-    state.includeGeneral = true; state.min = ""; state.max = ""; state.scoping = "include"; state.learner = "any";
-    state.dedupe = false;
-    pushStateToControls(); render();
+    Object.assign(state, { q: "", min: "", max: "", scoping: "include", learner: "any", dedupe: false });
+    state.leaves.clear(); state.types.clear(); expanded.clear();
+    syncControls(); render();
   }
-
-  function toast(msg) {
-    const t = $("toast"); t.textContent = msg; t.style.display = "block";
-    clearTimeout(toast._t); toast._t = setTimeout(() => { t.style.display = "none"; }, 2000);
-  }
-
-  async function copy(text, msg) {
-    try { await navigator.clipboard.writeText(text); toast(msg); }
-    catch (e) { window.prompt("Copy this:", text); }
-  }
-
+  function toast(msg) { const t = $("toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toast.t); toast.t = setTimeout(() => (t.style.display = "none"), 2000); }
+  async function copy(text, msg) { try { await navigator.clipboard.writeText(text); toast(msg); } catch (e) { window.prompt("Copy this:", text); } }
   function csv(list) {
-    const cell = (v) => `"${String(v === null ? "" : v).replace(/"/g, '""')}"`;
-    const head = ["Section", "ID", "Service", "Service Type", "Product/Edition", "Credits", "Per Learner", "Catalog Page", "Description"];
-    const rows = list.map((s) => [SECTION[s.section].name, s.id, s.name, s.type, s.edition,
-      s.scoping ? "Scoping Required" : s.credits, s.perLearner ? "Yes" : "No", s.page, s.desc].map(cell).join(","));
-    return "\uFEFF" + [head.map(cell).join(",")].concat(rows).join("\r\n");
+    const cell = (v) => `"${String(v).replace(/"/g, '""')}"`;
+    const head = ["Section", "Product", "ID", "Service", "Service Type", "Credits", "Per Learner", "Catalog Page", "Description"];
+    return "\uFEFF" + [head, ...list.map((s) => [SECTION[s.section].name, s.product === GENERAL ? GENERAL_LABEL : s.product, s.id, s.name, s.type,
+      s.scoping ? "Scoping Required" : s.credits, s.perLearner ? "Yes" : "No", s.page, s.desc])].map((r) => r.map(cell).join(",")).join("\r\n");
   }
 
   /* ---------- Events ---------- */
   function bind() {
-    let debounce;
-    $("q").addEventListener("input", (e) => { clearTimeout(debounce); debounce = setTimeout(() => { state.q = e.target.value.trim(); render(); }, 120); });
+    let deb;
+    $("q").addEventListener("input", (e) => { clearTimeout(deb); deb = setTimeout(() => { state.q = e.target.value.trim(); render(); }, 120); });
+    ["min", "max"].forEach((id) => $(id).addEventListener("input", (e) => { state[id] = e.target.value; syncControls(); render(); }));
 
     document.addEventListener("change", (e) => {
-      const el = e.target;
-      if (el.dataset.group) { el.checked ? state[el.dataset.group].add(el.value) : state[el.dataset.group].delete(el.value); render(); }
-      else if (el.id === "include-general") { state.includeGeneral = el.checked; render(); }
-      else if (el.id === "scoping") { state.scoping = el.value; render(); }
-      else if (el.id === "learner") { state.learner = el.value; render(); }
-      else if (el.id === "sort") { state.sort = el.value; render(); }
-      else if (el.id === "group") { state.group = el.checked; render(); }
-      else if (el.id === "dedupe") { state.dedupe = el.checked; render(); }
-      else if (el.dataset.qty) { plan.set(+el.dataset.qty, Math.max(1, parseInt(el.value, 10) || 1)); renderPlan(); }
+      const el = e.target, d = el.dataset;
+      if (d.sec) {
+        const t = TREE.find((x) => x.sec.key === d.sec);
+        const all = t.leaves.every((l) => state.leaves.has(l.key));
+        t.leaves.forEach((l) => (all ? state.leaves.delete(l.key) : state.leaves.add(l.key)));
+      } else if (d.leaf) { el.checked ? state.leaves.add(d.leaf) : state.leaves.delete(d.leaf); }
+      else if (d.type) { el.checked ? state.types.add(d.type) : state.types.delete(d.type); }
+      else if (d.qty) { plan.set(+d.qty, Math.max(1, parseInt(el.value, 10) || 1)); renderPlan(); return; }
+      else if (el.id === "scoping") state.scoping = el.value;
+      else if (el.id === "learner") state.learner = el.value;
+      else if (el.id === "sort") state.sort = el.value;
+      else if (el.id === "group") state.group = el.checked;
+      else if (el.id === "dedupe") state.dedupe = el.checked;
+      else return;
+      syncControls(); render();
     });
-    ["min", "max"].forEach((id) => $(id).addEventListener("input", (e) => { state[id] = e.target.value; render(); }));
 
     document.addEventListener("click", (e) => {
-      const t = e.target.closest("button");
-      if (!t) return;
-      if (t.dataset.add !== undefined) {
-        const idx = +t.dataset.add;
-        plan.has(idx) ? plan.delete(idx) : plan.set(idx, 1);
-        const on = plan.has(idx);
-        t.setAttribute("aria-pressed", on); t.textContent = on ? "In plan" : "Add";
-        t.closest("tr").classList.toggle("in-plan", on);
-        renderPlan();
-      } else if (t.dataset.expand !== undefined) {
-        const d = $("d" + t.dataset.expand); const open = d.classList.toggle("clamp") === false;
-        t.setAttribute("aria-expanded", open); t.textContent = open ? "Show less" : "Show full description";
-      } else if (t.dataset.min !== undefined) {
-        state.min = t.dataset.min; state.max = t.dataset.max; $("min").value = state.min; $("max").value = state.max; render();
-      } else if (t.dataset.clear) {
-        const g = t.dataset.clear, v = t.dataset.value;
-        if (g === "q") state.q = "";
-        else if (g === "range") { state.min = ""; state.max = ""; }
-        else if (g === "scoping") state.scoping = "include";
-        else if (g === "learner") state.learner = "any";
-        else state[g].delete(v);
-        pushStateToControls(); render();
-      } else if (t.dataset.remove !== undefined) {
-        plan.delete(+t.dataset.remove); renderPlan(); render();
-      } else if (t.dataset.action === "reset" || t.id === "reset") {
-        resetAll();
-      }
+      const b = e.target.closest("button"); if (!b) return;
+      const d = b.dataset;
+      if (d.twisty) {
+        expanded.has(d.twisty) ? expanded.delete(d.twisty) : expanded.add(d.twisty);
+        $("kids-" + d.twisty).hidden = !expanded.has(d.twisty); b.setAttribute("aria-expanded", expanded.has(d.twisty));
+      } else if (d.add !== undefined) {
+        const i = +d.add; plan.has(i) ? plan.delete(i) : plan.set(i, 1);
+        const on = plan.has(i); b.setAttribute("aria-pressed", on); b.textContent = on ? "Added" : "Add to plan";
+        b.closest(".svc").classList.toggle("in-plan", on); renderPlan();
+      } else if (d.expand !== undefined) {
+        const p = $("d" + d.expand), open = !p.classList.toggle("clamp");
+        b.setAttribute("aria-expanded", open); b.textContent = open ? "Show less" : "Read full description";
+      } else if (d.min !== undefined) {
+        const same = state.min === d.min && state.max === d.max;
+        state.min = same ? "" : d.min; state.max = same ? "" : d.max; syncControls(); render();
+      } else if (d.clear) {
+        const v = d.value;
+        if (d.clear === "q") state.q = "";
+        else if (d.clear === "sec") TREE.find((t) => t.sec.key === v).leaves.forEach((l) => state.leaves.delete(l.key));
+        else if (d.clear === "leaf") state.leaves.delete(v);
+        else if (d.clear === "type") state.types.delete(v);
+        else if (d.clear === "range") { state.min = ""; state.max = ""; }
+        else if (d.clear === "scoping") state.scoping = "include";
+        else if (d.clear === "learner") state.learner = "any";
+        syncControls(); render();
+      } else if (d.remove !== undefined) { plan.delete(+d.remove); renderPlan(); render(); }
+      else if (d.action === "reset" || b.id === "reset") resetAll();
     });
 
     $("filter-toggle").addEventListener("click", () => {
-      const f = $("filters"); const open = f.dataset.open !== "true";
-      f.dataset.open = open; $("filter-toggle").setAttribute("aria-expanded", open);
-      $("filter-toggle").textContent = open ? "Hide filters" : "Show filters";
+      const f = $("filters"), open = f.dataset.open !== "true";
+      f.dataset.open = open; $("filter-toggle").setAttribute("aria-expanded", open); $("filter-toggle").textContent = open ? "Hide filters" : "Show filters";
     });
     $("copy-link").addEventListener("click", () => copy(location.href, "Link copied"));
     $("export").addEventListener("click", () => {
-      const blob = new Blob([csv(filtered())], { type: "text/csv;charset=utf-8" });
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob); a.download = `experience-services-${C.meta.version}.csv`;
-      document.body.appendChild(a); a.click(); a.remove();
+      a.href = URL.createObjectURL(new Blob([csv(filtered())], { type: "text/csv;charset=utf-8" }));
+      a.download = `experience-services-${C.meta.version}.csv`; document.body.appendChild(a); a.click(); a.remove();
     });
     $("plan-open").addEventListener("click", () => togglePlan(true));
     $("plan-close").addEventListener("click", () => togglePlan(false));
     $("scrim").addEventListener("click", () => togglePlan(false));
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && $("plan").dataset.open === "true") togglePlan(false); });
-    $("plan-copy").addEventListener("click", () => plan.size ? copy(planText(), "Plan copied") : toast("The plan is empty"));
+    $("plan-copy").addEventListener("click", () => (plan.size ? copy(planText(), "Plan copied") : toast("Add a service first")));
     $("plan-clear").addEventListener("click", () => { plan.clear(); renderPlan(); render(); });
   }
 
-  renderStatic();
-  renderFilterControls();
-  loadUrl();
-  pushStateToControls();
-  bind();
-  render();
-  renderPlan();
+  renderStatic(); renderControls(); loadUrl(); syncControls(); bind(); render(); renderPlan();
 })();
 </script>
 </body>
