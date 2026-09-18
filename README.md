@@ -6,7 +6,8 @@ Searchable, filterable version of the Government Experience Cloud Experience Ser
 
 - `index.html` is the page, styles, and app logic.
 - `data.js` is the Government Experience Cloud catalog.
-- `catalog-destination.js` and `catalog-federal.js` are placeholders for the Destination Cloud and Federal Experience Cloud catalogs.
+- `catalog-destination.js` is the Destination Experience Cloud catalog (2026.Q3), transcribed from its deck.
+- `catalog-federal.js` is the Federal Experience Cloud catalog (2026.Q2), transcribed from its deck.
 - `search-terms.js` is the search vocabulary: filler words to ignore and groups of related terms. Upload it next to `index.html`. Every service row cites the PDF page it came from.
 - `assets/` holds the logo (not included, see below).
 
@@ -56,7 +57,15 @@ To tune results, edit `search-terms.js`: add a word to `ignore`, add a term to a
 
 Each catalog file registers itself with `window.CATALOGS`, and the tabs in the header switch between them. Switching reloads the page content, clears filters and the credit plan, and records the choice in the URL (`?cat=destination`). Stakeholders only work in one cloud, so nothing is shared across tabs.
 
-To load a new catalog, open `catalog-destination.js` or `catalog-federal.js` and fill in `meta`, `sections`, optional `clouds`, and `rows` in the same shape as `data.js`, then delete the `comingSoon` line. Until then that tab shows a "Not loaded yet" notice.
+Catalog contents by tab:
+
+| Tab | Version | Sections | Services |
+|---|---|---|---|
+| Government Experience Cloud | 2026.Q3 | 11 | 284 listings, 275 unique |
+| Destination Experience Cloud | 2026.Q3 | 8 (Meetings and Tourism) | 80 listings, 60 unique |
+| Federal Experience Cloud | 2026.Q2 | 3 | 27 |
+
+The Destination and Federal decks list no service-type column, so the service type filter and tag are hidden on those tabs. Their page numbers refer to slide numbers in the source decks.
 
 ## Clouds
 
@@ -67,7 +76,9 @@ To load a new catalog, open `catalog-destination.js` or `catalog-federal.js` and
 - Operations Cloud: Records Request Management, Video, Agenda & Meeting, Boards & Commissions
 - Always shown: Overall Strategy
 
-Permitting, Compliance, & Licensing is not assigned to a cloud. Edit the `clouds` array to change any of this.
+Permitting, Compliance, & Licensing is not assigned to a cloud.
+
+Destination Experience Cloud: Meetings Cloud (Marketing, Enablement, Go-To-Market Strategy) and Tourism Cloud (Content, Design, Experience, Marketing, Optimization). The Marketing services appear in both divisions in the source deck, so they show under whichever cloud is selected. Federal Experience Cloud has no cloud bundles. Edit the `clouds` array in any catalog file to change this.
 
 ## Credit plan email
 

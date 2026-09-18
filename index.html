@@ -553,7 +553,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
           <option value="flat">Not per learner</option>
         </select>
       </div>
-      <div class="fgroup">
+      <div class="fgroup" id="types-group">
         <h2>Service type</h2>
         <div id="types"></div>
       </div>
@@ -706,7 +706,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       };
     });
     ALL_LEAVES = new Set(TREE.flatMap((t) => t.leaves.map((l) => l.key)));
-    TYPES = [...new Set(services.map((s) => s.type))];
+    TYPES = [...new Set(services.map((s) => s.type))].filter(Boolean);
     CLOUD_ALWAYS = (C.cloudAlways || []).filter((k) => SECTION[k]);
     CLOUDS = (C.clouds || []).map((cl) => ({ name: cl.name, sections: cl.sections.filter((k) => SECTION[k]) })).filter((cl) => cl.sections.length);
     indexSearchFields();
@@ -779,6 +779,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
           `<label class="check"><input type="checkbox" data-leaf="${esc(l.key)}"><span>${esc(l.label)}</span><span class="count">${l.count}</span></label>`).join("")}</div>` : ""}
       </div>`).join("");
 
+    $("types-group").hidden = !TYPES.length;
     $("types").innerHTML = TYPES.map((ty) =>
       `<label class="check"><input type="checkbox" data-type="${esc(ty)}"><span>${esc(ty)}</span><span class="count">${services.filter((s) => s.type === ty).length}</span></label>`).join("");
 
@@ -984,7 +985,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   function tagsHtml(s, withDup) {
     return [
       s.product !== GENERAL ? `<span class="tag product">${esc(s.product)}</span>` : "",
-      `<span class="tag">${esc(s.type)}</span>`,
+      s.type ? `<span class="tag">${esc(s.type)}</span>` : "",
       s.perLearner ? `<span class="tag learner">Per learner</span>` : "",
       withDup && s.others.length ? `<span class="tag dup">Also in ${esc(s.others.join(", "))}</span>` : ""
     ].join("");
@@ -998,7 +999,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     const sec = SECTION[s.section], on = plan.has(s.idx);
     const typeLine = [
       s.product !== GENERAL ? `<span class="product">${esc(s.product)}</span>` : "",
-      esc(s.type),
+      s.type ? esc(s.type) : "",
       s.perLearner ? "Per learner" : ""
     ].filter(Boolean).join(" | ");
     return `<article class="pcard${on ? " in-plan" : ""}" style="--accent:${sec.color}">
