@@ -8,7 +8,7 @@
 (window.CATALOGS = window.CATALOGS || []).push({
   meta: {
       "id": "destination",
-      "tab": "Destination Cloud",
+      "tab": "Destination Experience Cloud",
       "title": "Experience Services Catalog",
       "subtitle": "Destination Experience Cloud",
       "version": "2026.Q3",
