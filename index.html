@@ -777,15 +777,19 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
 
   function renderControls() {
     const chev = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>`;
-    const sectionBlock = (t) => `
+    let uid = 0;
+    const sectionBlock = (t) => {
+      const kidsId = `kids-${t.sec.key}-${++uid}`;
+      return `
       <div class="tree-sec">
         <div class="tree-row">
-          ${t.nested ? `<button type="button" class="twisty" data-twisty="${t.sec.key}" aria-expanded="false" aria-controls="kids-${t.sec.key}" aria-label="Show products in ${esc(t.sec.name)}">${chev}</button>` : `<span class="twisty-spacer"></span>`}
+          ${t.nested ? `<button type="button" class="twisty" data-twisty="${t.sec.key}" aria-expanded="false" aria-controls="${kidsId}" aria-label="Show products in ${esc(t.sec.name)}">${chev}</button>` : `<span class="twisty-spacer"></span>`}
           <label class="check"><input type="checkbox" data-sec="${t.sec.key}"><span class="dot" style="background:${t.sec.color}"></span><span>${esc(shortName(t.sec.name))}</span><span class="count">${t.count}</span></label>
         </div>
-        ${t.nested ? `<div class="tree-kids" id="kids-${t.sec.key}" hidden>${t.leaves.map((l) =>
+        ${t.nested ? `<div class="tree-kids" id="${kidsId}" data-seckids="${t.sec.key}" hidden>${t.leaves.map((l) =>
           `<label class="check"><input type="checkbox" data-leaf="${esc(l.key)}"><span>${esc(l.label)}</span><span class="count">${l.count}</span></label>`).join("")}</div>` : ""}
       </div>`;
+    };
 
     $("tree").innerHTML = TREE_GROUPS.map((g) => {
       if (!g.name) return g.sections.map(sectionBlock).join("");
@@ -823,12 +827,13 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     });
     TREE.forEach((t) => {
       const sel = t.leaves.filter((l) => state.leaves.has(l.key)).length;
-      const box = document.querySelector(`[data-sec="${t.sec.key}"]`);
-      if (!box) return;
-      box.checked = sel === t.leaves.length; box.indeterminate = sel > 0 && sel < t.leaves.length;
+      document.querySelectorAll(`[data-sec="${t.sec.key}"]`).forEach((box) => {
+        box.checked = sel === t.leaves.length; box.indeterminate = sel > 0 && sel < t.leaves.length;
+      });
       if (sel > 0 && sel < t.leaves.length) expanded.add(t.sec.key);
-      const kids = $("kids-" + t.sec.key), tw = document.querySelector(`[data-twisty="${t.sec.key}"]`);
-      if (kids) { kids.hidden = !expanded.has(t.sec.key); tw.setAttribute("aria-expanded", expanded.has(t.sec.key)); }
+      const open = expanded.has(t.sec.key);
+      document.querySelectorAll(`[data-seckids="${t.sec.key}"]`).forEach((k) => { k.hidden = !open; });
+      document.querySelectorAll(`[data-twisty="${t.sec.key}"]`).forEach((tw) => tw.setAttribute("aria-expanded", open));
     });
     document.querySelectorAll("[data-leaf]").forEach((el) => { el.checked = state.leaves.has(el.dataset.leaf); });
     document.querySelectorAll("[data-type]").forEach((el) => { el.checked = state.types.has(el.dataset.type); });
@@ -1257,10 +1262,9 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       if (d.twisty) {
         const open = !expanded.has(d.twisty);
         open ? expanded.add(d.twisty) : expanded.delete(d.twisty);
-        const kids = d.twisty.startsWith("cloud:")
-          ? document.querySelector(`[data-groupkids="${d.twisty}"]`) : $("kids-" + d.twisty);
-        if (kids) kids.hidden = !open;
-        b.setAttribute("aria-expanded", open);
+        const sel = d.twisty.startsWith("cloud:") ? `[data-groupkids="${d.twisty}"]` : `[data-seckids="${d.twisty}"]`;
+        document.querySelectorAll(sel).forEach((k) => { k.hidden = !open; });
+        document.querySelectorAll(`[data-twisty="${CSS.escape(d.twisty)}"]`).forEach((tw) => tw.setAttribute("aria-expanded", open));
       } else if (d.catalog) {
         loadCatalog(d.catalog);
       } else if (d.page !== undefined) {
