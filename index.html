@@ -725,8 +725,10 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     TREE.forEach((t) => {
       t.general = t.leaves.find((l) => l.key.endsWith("::" + GENERAL)) || null;
       t.products = t.leaves.filter((l) => l !== t.general);
-      // Products A to Z, with the cross-product row last.
-      const sorted = [...t.products].sort((x, y) => x.label.localeCompare(y.label));
+      // Products A to Z, except Essentials always comes before Enhanced.
+      // Tier order within a family: Essentials, Enhanced, Enterprise.
+      const tierKey = (label) => label.replace(/\bEssentials\b/, "Tier 1").replace(/\bEnhanced\b/, "Tier 2").replace(/\bEnterprise\b/, "Tier 3");
+      const sorted = [...t.products].sort((x, y) => tierKey(x.label).localeCompare(tierKey(y.label)));
       t.own = t.general ? [...sorted, t.general] : sorted;
       t.ownCount = t.own.reduce((a, l) => a + l.count, 0);
       t.nested = t.own.length > 1;
