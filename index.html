@@ -722,19 +722,17 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     } else {
       TREE_GROUPS = [{ key: null, name: null, sections: TREE }];
     }
-    const grouped = TREE_GROUPS.some((g) => g.name);
     TREE.forEach((t) => {
       t.general = t.leaves.find((l) => l.key.endsWith("::" + GENERAL)) || null;
       t.products = t.leaves.filter((l) => l !== t.general);
-      // With clouds, cross-product services move to one row per cloud, so a
-      // section row controls only its product-specific services.
-      t.own = grouped && t.products.length ? t.products : t.leaves;
+      // Product-specific rows first, product-agnostic services last.
+      t.own = t.general ? [...t.products, t.general] : t.leaves;
       t.ownCount = t.own.reduce((a, l) => a + l.count, 0);
       t.nested = t.own.length > 1;
     });
     TREE_GROUPS.forEach((g) => {
-      g.sectionRows = g.name ? g.sections.filter((t) => t.products.length) : g.sections;
-      g.generals = g.name ? g.sections.filter((t) => t.general) : [];
+      g.sectionRows = g.sections;
+      g.generals = [];
     });
     indexSearchFields();
   }
@@ -809,22 +807,12 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       if (!g.name) return g.sections.map(sectionBlock).join("");
       const count = g.sections.reduce((a, t) => a + t.count, 0);
       const id = g.key.replace(/[^a-z0-9]+/gi, "-");
-      const genCount = g.generals.reduce((a, t) => a + t.general.count, 0);
-      const genRow = g.generals.length ? `
-        <div class="tree-sec">
-          <div class="tree-row">
-            <button type="button" class="twisty" data-twisty="gen:${esc(g.key)}" aria-expanded="false" aria-controls="gen-${id}" aria-label="Show cross-product services in ${esc(g.name)}">${chev}</button>
-            <label class="check"><input type="checkbox" data-genrow="${esc(g.key)}"><span class="dot" style="background:#BFBFBF"></span><span>${esc(GENERAL_LABEL)}</span><span class="count">${genCount}</span></label>
-          </div>
-          <div class="tree-kids" id="gen-${id}" data-genkids="${esc(g.key)}" hidden>${g.generals.map((t) =>
-            `<label class="check"><input type="checkbox" data-leaf="${esc(t.general.key)}"><span>${esc(shortName(t.sec.name))}</span><span class="count">${t.general.count}</span></label>`).join("")}</div>
-        </div>` : "";
       return `<div class="tree-group">
         <div class="tree-row tree-row-cloud">
           <button type="button" class="twisty" data-twisty="${esc(g.key)}" aria-expanded="false" aria-controls="kids-${id}" aria-label="Show sections in ${esc(g.name)}">${chev}</button>
           <label class="check"><input type="checkbox" data-group="${esc(g.key)}"><span>${esc(g.name)}</span><span class="count">${count}</span></label>
         </div>
-        <div class="tree-kids" id="kids-${id}" data-groupkids="${esc(g.key)}" hidden>${g.sectionRows.map(sectionBlock).join("")}${genRow}</div>
+        <div class="tree-kids" id="kids-${id}" data-groupkids="${esc(g.key)}" hidden>${g.sectionRows.map(sectionBlock).join("")}</div>
       </div>`;
     }).join("");
 
@@ -848,19 +836,6 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       if (sel > 0 && sel < keys.length) expanded.add(g.key);
       const kids = document.querySelector(`[data-groupkids="${g.key}"]`), tw = document.querySelector(`[data-twisty="${g.key}"]`);
       if (kids) { kids.hidden = !expanded.has(g.key); tw.setAttribute("aria-expanded", expanded.has(g.key)); }
-    });
-    TREE_GROUPS.forEach((g) => {
-      if (!g.name || !g.generals.length) return;
-      const keys = g.generals.map((t) => t.general.key);
-      const sel = keys.filter((k) => state.leaves.has(k)).length;
-      const box = document.querySelector(`[data-genrow="${g.key}"]`);
-      if (!box) return;
-      box.checked = sel === keys.length; box.indeterminate = sel > 0 && sel < keys.length;
-      const key = "gen:" + g.key;
-      if (sel > 0 && sel < keys.length) expanded.add(key);
-      const open = expanded.has(key);
-      document.querySelectorAll(`[data-genkids="${g.key}"]`).forEach((k) => { k.hidden = !open; });
-      document.querySelectorAll(`[data-twisty="${key}"]`).forEach((tw) => tw.setAttribute("aria-expanded", open));
     });
     TREE.forEach((t) => {
       const sel = t.own.filter((l) => state.leaves.has(l.key)).length;
@@ -1173,12 +1148,6 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
         g.sections.forEach((t) => shownSections.add(t.sec.key));
         return;
       }
-      const gen = g.generals.map((t) => t.general.key);
-      if (gen.length && gen.every((k) => state.leaves.has(k))) {
-        pills.push(["genrow", g.key, `${g.name}: ${GENERAL_LABEL}`]);
-        gen.forEach((k) => shownLeaves.add(k));
-        g.sections.forEach((t) => { if (!t.products.length) shownSections.add(t.sec.key); });
-      }
     });
     TREE.forEach((t) => {
       if (shownSections.has(t.sec.key)) return;
@@ -1288,11 +1257,6 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
         const keys = g.sections.flatMap((t) => t.leaves.map((l) => l.key));
         const all = keys.every((k) => state.leaves.has(k));
         keys.forEach((k) => (all ? state.leaves.delete(k) : state.leaves.add(k)));
-      } else if (d.genrow) {
-        const g = TREE_GROUPS.find((x) => x.key === d.genrow);
-        const keys = g.generals.map((t) => t.general.key);
-        const all = keys.every((k) => state.leaves.has(k));
-        keys.forEach((k) => (all ? state.leaves.delete(k) : state.leaves.add(k)));
       } else if (d.sec) {
         const t = TREE.find((x) => x.sec.key === d.sec);
         const all = t.own.every((l) => state.leaves.has(l.key));
@@ -1313,8 +1277,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       if (d.twisty) {
         const open = !expanded.has(d.twisty);
         open ? expanded.add(d.twisty) : expanded.delete(d.twisty);
-        const sel = d.twisty.startsWith("gen:") ? `[data-genkids="${d.twisty.slice(4)}"]`
-          : d.twisty.startsWith("cloud:") ? `[data-groupkids="${d.twisty}"]` : `[data-seckids="${d.twisty}"]`;
+        const sel = d.twisty.startsWith("cloud:") ? `[data-groupkids="${d.twisty}"]` : `[data-seckids="${d.twisty}"]`;
         document.querySelectorAll(sel).forEach((k) => { k.hidden = !open; });
         document.querySelectorAll(`[data-twisty="${CSS.escape(d.twisty)}"]`).forEach((tw) => tw.setAttribute("aria-expanded", open));
       } else if (d.catalog) {
@@ -1341,7 +1304,6 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
         else if (d.clear === "group") TREE_GROUPS.find((g) => g.key === v).sections.forEach((t) => t.leaves.forEach((l) => state.leaves.delete(l.key)));
         else if (d.clear === "sec") TREE.find((t) => t.sec.key === v).leaves.forEach((l) => state.leaves.delete(l.key));
         else if (d.clear === "own") TREE.find((t) => t.sec.key === v).own.forEach((l) => state.leaves.delete(l.key));
-        else if (d.clear === "genrow") TREE_GROUPS.find((g) => g.key === v).generals.forEach((t) => state.leaves.delete(t.general.key));
         else if (d.clear === "leaf") state.leaves.delete(v);
         else if (d.clear === "type") state.types.delete(v);
         else if (d.clear === "range") { state.min = ""; state.max = ""; }
