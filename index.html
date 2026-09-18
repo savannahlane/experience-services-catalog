@@ -429,6 +429,17 @@ dialog.detail::backdrop { background: rgba(28,28,28,.55); backdrop-filter: blur(
 .plan-fab { border-radius: 999px; padding: 14px 26px; box-shadow: 0 18px 40px rgba(196,45,61,.28); }
 .scrim { background: rgba(28,28,28,.45); backdrop-filter: blur(2px); }
 
+/* Catalog switcher */
+.cat-switch { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; background: #F4F4F4; border-radius: 999px; }
+.cat-switch button { border: 0; background: none; border-radius: 999px; padding: 9px 18px; font-size: 14px; letter-spacing: .01em; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.cat-switch button:hover { color: var(--ink); }
+.cat-switch button[aria-pressed="true"] { background: #FFFFFF; color: var(--ink); box-shadow: 0 2px 8px rgba(28,28,28,.10); }
+@media (max-width: 760px) { .cat-switch { width: 100%; order: 3; justify-content: center; } .cat-switch button { padding: 8px 12px; font-size: 13px; } }
+.coming-soon { text-align: center; padding: 72px 28px; border: 1px solid var(--line); border-radius: var(--radius); background: #FAFAFA; }
+.coming-soon h2 { margin: 0 0 8px; font-size: 24px; }
+.coming-soon p { margin: 0 auto; max-width: 52ch; color: var(--muted); }
+main.empty-catalog .results-bar, main.empty-catalog .pills, main.empty-catalog .pager, main.empty-catalog .pager-info { display: none; }
+
 /* Filters button */
 .btn.filters-btn { border: 1.5px solid var(--ink); color: var(--ink); background: #FFFFFF; padding: 10px 20px; -webkit-text-stroke: 0.25px currentColor; }
 .btn.filters-btn:hover { background: #F4F4F4; border-color: var(--ink); }
@@ -457,7 +468,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   <div class="wrap header-row">
     <!-- Approved logo file goes in assets/ (see README). The image hides itself until the file exists. -->
     <img class="logo" src="assets/Granicus_Horizontal_OnWhite.png" alt="Granicus" onerror="this.remove()">
-    <span class="header-title" id="header-title"></span>
+    <nav class="cat-switch" id="cat-switch" aria-label="Choose a catalog"></nav>
     <a class="btn btn-red btn-sm" id="header-contact" href="#">Contact your Experience Partner</a>
   </div>
 </header>
@@ -513,6 +524,11 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       <button type="button" class="detail-close" id="filters-close" aria-label="Close filters">&times;</button>
     </div>
     <div class="filter-panel" id="filter-panel">
+      <div class="fgroup" id="cloud-group" hidden>
+        <h2>Cloud</h2>
+        <p class="fhint">Show only the sections included in a cloud.</p>
+        <div id="cloud-filters"></div>
+      </div>
       <div class="fgroup">
         <h2>Catalog section</h2>
         <p class="fhint">Check a section for everything in it, or open it to pick specific products.</p>
@@ -609,7 +625,8 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     <div class="plan-total"><span>Total credits</span><strong id="plan-total">0</strong></div>
     <p class="plan-note" id="plan-note"></p>
     <div class="plan-actions">
-      <button class="btn btn-red btn-sm" type="button" id="plan-copy">Copy plan as text</button>
+      <button class="btn btn-red btn-sm" type="button" id="plan-email">Email this plan</button>
+      <button class="btn btn-ghost btn-sm" type="button" id="plan-copy">Copy as text</button>
       <button class="btn btn-ghost btn-sm" type="button" id="plan-clear">Clear plan</button>
     </div>
   </div>
@@ -618,11 +635,12 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
 <div class="toast" id="toast" role="status"></div>
 
 <script src="data.js"></script>
+<script src="catalog-destination.js"></script>
+<script src="catalog-federal.js"></script>
 <script src="search-terms.js"></script>
 <script>
 (function () {
   "use strict";
-  const C = window.CATALOG;
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const tint = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
@@ -630,7 +648,8 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   const GENERAL_LABEL = "Services for all products";
 
   /* ---------- Data preparation ---------- */
-  const SECTION = Object.fromEntries(C.sections.map((s) => [s.key, s]));
+  let C, SECTION, services, byId, TREE, ALL_LEAVES, TYPES, CLOUDS, CLOUD_ALWAYS;
+  const CATALOGS = (window.CATALOGS || []).filter(Boolean);
 
   function productOf(id, name) {
     if (/PCL Enterprise/.test(name)) return "PCL Enterprise";
@@ -656,48 +675,58 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     "PCL Enterprise": "amanda", "Sentiment & Feedback": "engagementhq"
   };
 
-  const services = [];
-  C.sections.forEach((sec) => (C.rows[sec.key] || []).forEach(([page, id, name, type, credits, desc]) => {
-    services.push({
-      idx: services.length, page, id, name, type, credits, desc, section: sec.key,
-      product: productOf(id, name), scoping: credits === null,
-      perLearner: /pric(e|ing) is per learner/i.test(desc)
+  function buildIndex(cat) {
+    C = cat;
+    SECTION = Object.fromEntries((C.sections || []).map((x) => [x.key, x]));
+    services = []; byId = {};
+    (C.sections || []).forEach((sec) => ((C.rows && C.rows[sec.key]) || []).forEach(([page, id, name, type, credits, desc]) => {
+      services.push({
+        idx: services.length, page, id, name, type, credits, desc, section: sec.key,
+        product: productOf(id, name), scoping: credits === null,
+        perLearner: /pric(e|ing) is per learner/i.test(desc)
+      });
+    }));
+    services.forEach((s) => (byId[s.id] = byId[s.id] || []).push(s));
+    services.forEach((s) => {
+      s.leaf = s.section + "::" + s.product;
+      s.others = byId[s.id].filter((o) => o !== s).map((o) => SECTION[o.section].name);
+      s.hay = [s.id, s.id.replace(/-/g, ""), s.name, SECTION[s.section].name, s.type, s.product, LEGACY[s.product] || "",
+        s.desc, s.scoping ? "scoping required" : s.credits + " credits", s.perLearner ? "per learner" : ""].join(" \u0001 ").toLowerCase();
     });
-  }));
-  const byId = {};
-  services.forEach((s) => (byId[s.id] = byId[s.id] || []).push(s));
-  services.forEach((s) => {
-    s.leaf = s.section + "::" + s.product;
-    s.others = byId[s.id].filter((o) => o !== s).map((o) => SECTION[o.section].name);
-    s.hay = [s.id, s.id.replace(/-/g, ""), s.name, SECTION[s.section].name, s.type, s.product, LEGACY[s.product] || "",
-      s.desc, s.scoping ? "scoping required" : s.credits + " credits", s.perLearner ? "per learner" : ""].join(" \u0001 ").toLowerCase();
-  });
 
-  // Section -> ordered product leaves (General last)
-  const TREE = C.sections.map((sec) => {
-    const items = services.filter((s) => s.section === sec.key);
-    const products = [];
-    items.forEach((s) => { if (s.product !== GENERAL && !products.includes(s.product)) products.push(s.product); });
-    if (items.some((s) => s.product === GENERAL)) products.push(GENERAL);
-    return {
-      sec, count: items.length,
-      leaves: products.map((p) => ({ key: sec.key + "::" + p, label: p === GENERAL ? GENERAL_LABEL : p, count: items.filter((s) => s.product === p).length })),
-      nested: products.some((p) => p !== GENERAL)
-    };
-  });
-  const ALL_LEAVES = new Set(TREE.flatMap((t) => t.leaves.map((l) => l.key)));
-  const TYPES = [...new Set(services.map((s) => s.type))];
+    TREE = (C.sections || []).map((sec) => {
+      const items = services.filter((s) => s.section === sec.key);
+      const products = [];
+      items.forEach((s) => { if (s.product !== GENERAL && !products.includes(s.product)) products.push(s.product); });
+      if (items.some((s) => s.product === GENERAL)) products.push(GENERAL);
+      return {
+        sec, count: items.length,
+        leaves: products.map((pr) => ({ key: sec.key + "::" + pr, label: pr === GENERAL ? GENERAL_LABEL : pr, count: items.filter((s) => s.product === pr).length })),
+        nested: products.some((pr) => pr !== GENERAL)
+      };
+    });
+    ALL_LEAVES = new Set(TREE.flatMap((t) => t.leaves.map((l) => l.key)));
+    TYPES = [...new Set(services.map((s) => s.type))];
+    CLOUD_ALWAYS = (C.cloudAlways || []).filter((k) => SECTION[k]);
+    CLOUDS = (C.clouds || []).map((cl) => ({ name: cl.name, sections: cl.sections.filter((k) => SECTION[k]) })).filter((cl) => cl.sections.length);
+    indexSearchFields();
+  }
 
   /* ---------- State ---------- */
-  const state = { q: "", leaves: new Set(), types: new Set(), min: "", max: "", learner: "any", sort: "catalog", page: 1, per: 24 };
+  const state = { q: "", clouds: new Set(), leaves: new Set(), types: new Set(), min: "", max: "", learner: "any", sort: "catalog", page: 1, per: 24 };
   const PER_OPTIONS = [12, 24, 48, 96];
   const expanded = new Set();
   const plan = new Map();
 
   /* ---------- Static content ---------- */
+  function renderSwitcher() {
+    $("cat-switch").innerHTML = CATALOGS.map((cat) =>
+      `<button type="button" data-catalog="${esc(cat.meta.id)}" aria-pressed="${cat === C}">${esc(cat.meta.tab || cat.meta.subtitle)}</button>`).join("");
+    $("cat-switch").hidden = CATALOGS.length < 2;
+  }
+
   function renderStatic() {
     const m = C.meta;
-    $("header-title").textContent = m.subtitle;
     $("eyebrow").textContent = m.title;
     $("title").textContent = m.subtitle;
     $("lede").textContent = m.intro;
@@ -709,6 +738,10 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     $("contact-email").href = "mailto:" + m.contact.email;
     $("source-note").textContent = `Source: ${m.title} - ${m.subtitle} | Version ${m.version} | Published: ${m.published} | ${m.region}.`;
 
+    $("meta-line").textContent = [m.version && `Version ${m.version}`, m.published && `Published ${m.published}`, m.region].filter(Boolean).join(" | ");
+    const gsEl = $("how").closest("section");
+    if (gsEl) gsEl.hidden = !m.gettingStarted;
+    if (!services.length) { $("stats").innerHTML = ""; return; }
     const priced = services.filter((s) => !s.scoping).map((s) => s.credits);
     const stats = [
       ["Browse the catalog", `<strong>${services.length}</strong> services`],
@@ -720,6 +753,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       : `<div class="stat"><div class="stat-head">${h}</div><div class="stat-body">${b}</div></div>`).join("");
 
     const g = m.gettingStarted;
+    if (!g) { $("how").innerHTML = ""; return; }
     const icons = [
       `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="9" width="34" height="24" rx="2"/><path d="M3 37h42"/><circle cx="24" cy="21" r="7"/><path d="m22 18 5 3-5 3z" fill="currentColor"/></svg>`,
       `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><circle cx="24" cy="26" r="6"/><path d="M13 44c1-7 5-11 11-11s10 4 11 11"/><path d="m12 7 1.6 3.3 3.6.5-2.6 2.5.6 3.6L12 15.2 8.8 16.9l.6-3.6-2.6-2.5 3.6-.5zM24 3l1.6 3.3 3.6.5-2.6 2.5.6 3.6L24 11.2l-3.2 1.7.6-3.6-2.6-2.5 3.6-.5zM36 7l1.6 3.3 3.6.5-2.6 2.5.6 3.6L36 15.2l-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z"/></svg>`
@@ -729,6 +763,11 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   }
 
   function renderControls() {
+    $("cloud-group").hidden = !CLOUDS.length;
+    $("cloud-filters").innerHTML = CLOUDS.map((cl) => {
+      const n = services.filter((s) => cl.sections.includes(s.section)).length;
+      return `<label class="check"><input type="checkbox" data-cloud="${esc(cl.name)}"><span>${esc(cl.name)}</span><span class="count">${n}</span></label>`;
+    }).join("");
     const chev = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>`;
     $("tree").innerHTML = TREE.map((t) => `
       <div class="tree-sec">
@@ -757,6 +796,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       const kids = $("kids-" + t.sec.key), tw = document.querySelector(`[data-twisty="${t.sec.key}"]`);
       if (kids) { kids.hidden = !expanded.has(t.sec.key); tw.setAttribute("aria-expanded", expanded.has(t.sec.key)); }
     });
+    document.querySelectorAll("[data-cloud]").forEach((el) => { el.checked = state.clouds.has(el.dataset.cloud); });
     document.querySelectorAll("[data-leaf]").forEach((el) => { el.checked = state.leaves.has(el.dataset.leaf); });
     document.querySelectorAll("[data-type]").forEach((el) => { el.checked = state.types.has(el.dataset.type); });
     $("min").value = state.min; $("max").value = state.max;
@@ -789,14 +829,16 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     return sh.length >= 5 && lo.startsWith(sh);
   };
 
-  services.forEach((s) => {
-    s.fields = [
+  function indexSearchFields() {
+    services.forEach((s) => {
+      s.fields = [
       { w: 6, text: norm(s.name) },
       { w: 4, text: norm([s.product, SECTION[s.section].name, s.type, LEGACY[s.product] || ""].join(" ")) },
       { w: 4, text: norm(s.id) },
-      { w: 2, text: norm(s.desc) }
-    ].map((f) => ({ ...f, toks: [...new Set(f.text.split(" ").map(stem))], padded: " " + f.text + " " }));
-  });
+        { w: 2, text: norm(s.desc) }
+      ].map((f) => ({ ...f, toks: [...new Set(f.text.split(" ").map(stem))], padded: " " + f.text + " " }));
+    });
+  }
 
   function termWeight(s, term) {
     let best = 0;
@@ -877,6 +919,12 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     }
   }
 
+  function cloudSections() {
+    const keys = new Set(CLOUD_ALWAYS);
+    CLOUDS.forEach((cl) => { if (state.clouds.has(cl.name)) cl.sections.forEach((k) => keys.add(k)); });
+    return keys;
+  }
+
   function filtered() {
     const { strict, freeText } = parseQuery(state.q);
     const concepts = buildConcepts(freeText);
@@ -884,6 +932,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     const min = state.min === "" ? null : +state.min, max = state.max === "" ? null : +state.max;
     const seen = new Set();
     let list = services.filter((s) => {
+      if (state.clouds.size && !cloudSections().has(s.section)) return false;
       if (state.leaves.size && !state.leaves.has(s.leaf)) return false;
       if (state.types.size && !state.types.has(s.type)) return false;
       if (state.learner === "per" && !s.perLearner) return false;
@@ -991,6 +1040,10 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       ? `Showing <strong>${start + 1}&ndash;${start + slice.length}</strong> of <strong>${list.length}</strong> service${list.length === 1 ? "" : "s"}`
       : `<strong>0</strong> services`;
 
+    if (!services.length) {
+      $("results").innerHTML = `<div class="coming-soon"><h2>Not loaded yet</h2><p>${esc(C.meta.comingSoon || "This catalog has no services yet.")}</p></div>`;
+      $("pager").innerHTML = ""; $("pager-info").textContent = ""; renderPills(); syncUrl(); return;
+    }
     $("results").innerHTML = list.length
       ? `<div class="grid">${slice.map(card).join("")}</div>`
       : `<div class="empty"><h2>No services match</h2><p>Try fewer words or a wider credit range.</p><button class="btn btn-red btn-sm" type="button" data-action="reset">Clear all filters</button></div>`;
@@ -1007,7 +1060,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       $("pager").innerHTML = ""; $("pager-info").textContent = "";
     }
     renderPills(); syncUrl();
-    const active = TREE.filter((t) => t.leaves.some((l) => state.leaves.has(l.key))).length + state.types.size +
+    const active = state.clouds.size + TREE.filter((t) => t.leaves.some((l) => state.leaves.has(l.key))).length + state.types.size +
       (state.min !== "" || state.max !== "" ? 1 : 0) + (state.learner !== "any" ? 1 : 0);
     $("filter-badge").hidden = !active; $("filter-badge").textContent = active;
     $("filters-apply").textContent = list.length ? `Show ${list.length} service${list.length === 1 ? "" : "s"}` : "No matches";
@@ -1042,6 +1095,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   function renderPills() {
     const pills = [];
     if (state.q) pills.push(["q", "", `Search: ${state.q}`]);
+    state.clouds.forEach((cl) => pills.push(["cloud", cl, cl]));
     TREE.forEach((t) => {
       const sel = t.leaves.filter((l) => state.leaves.has(l.key));
       if (!sel.length) return;
@@ -1096,6 +1150,8 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   function syncUrl() {
     const p = new URLSearchParams();
     if (state.q) p.set("q", state.q);
+    if (C !== CATALOGS[0]) p.set("cat", C.meta.id);
+    if (state.clouds.size) p.set("cl", [...state.clouds].join("|"));
     if (state.leaves.size) p.set("f", [...state.leaves].join("|"));
     if (state.types.size) p.set("ty", [...state.types].join("|"));
     if (state.min !== "") p.set("min", state.min);
@@ -1110,6 +1166,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   function loadUrl() {
     const p = new URLSearchParams(location.search);
     state.q = p.get("q") || "";
+    (p.get("cl") || "").split("|").filter((c) => CLOUDS.some((x) => x.name === c)).forEach((c) => state.clouds.add(c));
     (p.get("f") || "").split("|").filter((k) => ALL_LEAVES.has(k)).forEach((k) => state.leaves.add(k));
     (p.get("ty") || "").split("|").filter((t) => TYPES.includes(t)).forEach((t) => state.types.add(t));
     state.min = p.get("min") || ""; state.max = p.get("max") || "";
@@ -1122,7 +1179,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   /* ---------- Helpers ---------- */
   function resetAll() {
     Object.assign(state, { q: "", min: "", max: "", learner: "any" });
-    state.leaves.clear(); state.types.clear(); expanded.clear();
+    state.clouds.clear(); state.leaves.clear(); state.types.clear(); expanded.clear();
     syncControls(); render();
   }
   function toast(msg) { const t = $("toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toast.t); toast.t = setTimeout(() => (t.style.display = "none"), 2000); }
@@ -1142,7 +1199,8 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
 
     document.addEventListener("change", (e) => {
       const el = e.target, d = el.dataset;
-      if (d.sec) {
+      if (d.cloud) { el.checked ? state.clouds.add(d.cloud) : state.clouds.delete(d.cloud); }
+      else if (d.sec) {
         const t = TREE.find((x) => x.sec.key === d.sec);
         const all = t.leaves.every((l) => state.leaves.has(l.key));
         t.leaves.forEach((l) => (all ? state.leaves.delete(l.key) : state.leaves.add(l.key)));
@@ -1162,6 +1220,8 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       if (d.twisty) {
         expanded.has(d.twisty) ? expanded.delete(d.twisty) : expanded.add(d.twisty);
         $("kids-" + d.twisty).hidden = !expanded.has(d.twisty); b.setAttribute("aria-expanded", expanded.has(d.twisty));
+      } else if (d.catalog) {
+        loadCatalog(d.catalog);
       } else if (d.page !== undefined) {
         goToPage(+d.page);
       } else if (d.open !== undefined) {
@@ -1183,6 +1243,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
         if (d.clear === "q") state.q = "";
         else if (d.clear === "sec") TREE.find((t) => t.sec.key === v).leaves.forEach((l) => state.leaves.delete(l.key));
         else if (d.clear === "leaf") state.leaves.delete(v);
+        else if (d.clear === "cloud") state.clouds.delete(v);
         else if (d.clear === "type") state.types.delete(v);
         else if (d.clear === "range") { state.min = ""; state.max = ""; }
         else if (d.clear === "learner") state.learner = "any";
@@ -1219,12 +1280,36 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       if ($("filters").dataset.open === "true") toggleFilters(false);
     });
     $("plan-copy").addEventListener("click", () => (plan.size ? copy(planText(), "Plan copied") : toast("Add a service first")));
+    $("plan-email").addEventListener("click", () => {
+      if (!plan.size) return toast("Add a service first");
+      const subject = `${C.meta.subtitle} services - credit plan`;
+      const href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(planText())}`;
+      if (href.length > 1900) { copy(planText(), "Plan too long to email - copied instead"); return; }
+      window.location.href = href;
+    });
     $("plan-clear").addEventListener("click", () => { plan.clear(); renderPlan(); render(false); });
     $("detail").addEventListener("click", (e) => { if (e.target === $("detail")) $("detail").close(); });
     $("detail").addEventListener("close", () => { detailIdx = null; });
   }
 
-  renderStatic(); renderControls(); loadUrl(); syncControls(); bind(); render(false); renderPlan();
+  function loadCatalog(id, opts = {}) {
+    const cat = CATALOGS.find((x) => x.meta.id === id) || CATALOGS[0];
+    if (C === cat) return;
+    buildIndex(cat);
+    plan.clear(); renderPlan();
+    Object.assign(state, { q: "", min: "", max: "", learner: "any", sort: "catalog", page: 1 });
+    state.clouds.clear(); state.leaves.clear(); state.types.clear(); expanded.clear();
+    renderSwitcher(); renderStatic(); renderControls();
+    document.querySelector("main").classList.toggle("empty-catalog", !services.length);
+    if (opts.fromUrl) loadUrl();
+    syncControls(); render(false);
+    if (!opts.fromUrl) window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+
+  const startId = new URLSearchParams(location.search).get("cat");
+  buildIndex(CATALOGS.find((x) => x.meta.id === startId) || CATALOGS[0]);
+  document.querySelector("main").classList.toggle("empty-catalog", !services.length);
+  renderSwitcher(); renderStatic(); renderControls(); loadUrl(); syncControls(); bind(); render(false); renderPlan();
 })();
 </script>
 </body>

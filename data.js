@@ -11,8 +11,10 @@
  * credits = null means the catalog lists "Scoping Required".
  * When a new catalog version ships, update this file only.
  */
-window.CATALOG = {
+(window.CATALOGS = window.CATALOGS || []).push({
   meta: {
+    id: "gxc",
+    tab: "Government Experience Cloud",
     title: "Experience Services Catalog",
     subtitle: "Government Experience Cloud",
     version: "2026.Q3",
@@ -59,6 +61,15 @@ window.CATALOG = {
     { key: "pcl",   name: "Permitting, Compliance, & Licensing Services", color: "#EF6A57", startPage: 52,
       tagline: "Streamline permitting, licensing, compliance, planning, and code enforcement with services that enhance public safety, reduce administrative burdens, and accelerate development." }
   ],
+
+  // Cloud bundles: which catalog sections belong to each cloud a customer can buy.
+  // Sections listed in "always" appear with every cloud.
+  clouds: [
+    { name: "Service Cloud", sections: ["web", "fw", "sf", "comms", "srm"] },
+    { name: "Engagement Cloud", sections: ["comms", "sf"] },
+    { name: "Operations Cloud", sections: ["rrm", "vid", "amm", "bc"] }
+  ],
+  cloudAlways: ["strat"],
 
   rows: {
     web: [
@@ -804,4 +815,4 @@ Note: Price is per learner`],
 Note: Price is per learner`]
     ]
   }
-};
+});

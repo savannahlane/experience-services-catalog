@@ -5,7 +5,9 @@ Searchable, filterable version of the Government Experience Cloud Experience Ser
 ## Files
 
 - `index.html` is the page, styles, and app logic.
-- `data.js` is the catalog content. Every service row cites the PDF page it came from.
+- `data.js` is the Government Experience Cloud catalog.
+- `catalog-destination.js` and `catalog-federal.js` are placeholders for the Destination Cloud and Federal Experience Cloud catalogs.
+- `search-terms.js` is the search vocabulary: filler words to ignore and groups of related terms. Upload it next to `index.html`. Every service row cites the PDF page it came from.
 - `assets/` holds the logo (not included, see below).
 
 ## Publish on GitHub Pages
@@ -41,3 +43,32 @@ Edit `data.js` only: update `meta`, then add, remove, or change rows. Row format
 ## Fonts
 
 The page uses the brand guide stack with one addition: Sofia Pro, then Century Gothic, then Questrial (a free Google Font with a similar geometric shape), then Arial. Questrial loads from Google Fonts so visitors without Century Gothic still see something close to it. Questrial has a single weight, so browsers generate the bold. Check with Marketing if the fallback needs approval.
+
+## Search
+
+Plain-language descriptions work: "our clerks need help building agendas" returns agenda training first. Filler words ("we", "need", "help") are skipped, word endings are matched loosely (train, training, trainer), and words in the same group in `search-terms.js` count as related matches ranked below direct ones. Results with the "Recommended" sort are ordered by best match while searching and by catalog order otherwise.
+
+Quoted phrases, `field:value` terms, and `-exclusions` stay strict filters and can be mixed with a description.
+
+To tune results, edit `search-terms.js`: add a word to `ignore`, add a term to an existing group, or add a new group. Legacy product names live there so older terminology still finds services without appearing on the page.
+
+## Catalogs
+
+Each catalog file registers itself with `window.CATALOGS`, and the tabs in the header switch between them. Switching reloads the page content, clears filters and the credit plan, and records the choice in the URL (`?cat=destination`). Stakeholders only work in one cloud, so nothing is shared across tabs.
+
+To load a new catalog, open `catalog-destination.js` or `catalog-federal.js` and fill in `meta`, `sections`, optional `clouds`, and `rows` in the same shape as `data.js`, then delete the `comingSoon` line. Until then that tab shows a "Not loaded yet" notice.
+
+## Clouds
+
+`clouds` in each catalog file maps cloud bundles to catalog sections, and `cloudAlways` lists sections that appear with every cloud. For the Government Experience Cloud:
+
+- Service Cloud: Website, Forms & Workflow, Sentiment & Feedback, Communications, Service Request Management
+- Engagement Cloud: Communications, Sentiment & Feedback
+- Operations Cloud: Records Request Management, Video, Agenda & Meeting, Boards & Commissions
+- Always shown: Overall Strategy
+
+Permitting, Compliance, & Licensing is not assigned to a cloud. Edit the `clouds` array to change any of this.
+
+## Credit plan email
+
+"Email this plan" opens the visitor's default mail program with a draft containing the same text as "Copy as text." Very long plans exceed what a mail link can carry, so those are copied to the clipboard instead, with a message saying so.
