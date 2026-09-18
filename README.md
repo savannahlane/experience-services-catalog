@@ -69,16 +69,14 @@ The Destination and Federal decks list no service-type column, so the service ty
 
 ## Clouds
 
-`clouds` in each catalog file maps cloud bundles to catalog sections, and `cloudAlways` lists sections that appear with every cloud. For the Government Experience Cloud:
+`clouds` in each catalog file maps cloud bundles to catalog sections. The filter panel shows one tree: cloud, then section, then product. Checking any level selects everything inside it. Within a cloud, each section lists only its product-specific services; everything that is not tied to a product collects in one "Services for all products" row per cloud, which opens to show those services by section. For the Government Experience Cloud:
 
 - Service Cloud: Website, Forms & Workflow, Sentiment & Feedback, Communications, Service Request Management
 - Engagement Cloud: Communications, Sentiment & Feedback
 - Operations Cloud: Records Request Management, Video, Agenda & Meeting, Boards & Commissions
-- Always shown: Overall Strategy
+Overall Strategy and Permitting, Compliance, & Licensing belong to no cloud, so they sit under "Other services" at the bottom of the tree. Communications and Sentiment & Feedback appear under both Service Cloud and Engagement Cloud; checking one place checks both, since it is the same section.
 
-Permitting, Compliance, & Licensing is not assigned to a cloud.
-
-Destination Experience Cloud: Meetings Cloud (Marketing, Enablement, Go-To-Market Strategy) and Tourism Cloud (Content, Design, Experience, Marketing, Optimization). The Marketing services appear in both divisions in the source deck, so they show under whichever cloud is selected. Federal Experience Cloud has no cloud bundles. Edit the `clouds` array in any catalog file to change this.
+Destination Experience Cloud: Meetings Cloud (Marketing, Enablement, Go-To-Market Strategy) and Tourism Cloud (Content, Design, Experience, Marketing, Optimization). Section names written as "Meetings - Marketing Services" display as "Marketing" inside the tree and as "Meetings" on cards. The Marketing services appear in both divisions in the source deck, so they show under whichever cloud is selected. Federal Experience Cloud has no cloud bundles. Edit the `clouds` array in any catalog file to change this.
 
 ## Credit plan email
 
