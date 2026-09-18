@@ -148,6 +148,9 @@ details.tips summary { cursor: pointer; color: var(--red-dark); width: max-conte
 .check input { width: 17px; height: 17px; margin: 1px 0 0; flex: none; accent-color: var(--red-dark); cursor: pointer; }
 .check .count { margin-left: auto; padding-left: 10px; font-size: 12px; color: var(--muted); }
 
+.tree-group { margin-bottom: 4px; }
+.tree-row-cloud .check { font-size: 15px; }
+.tree-group > .tree-kids { margin-left: 17px; }
 .tree-sec { border-radius: 8px; }
 .tree-row { display: flex; align-items: flex-start; gap: 4px; }
 .tree-row .check { flex: 1; font-weight: 700; }
@@ -524,14 +527,9 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       <button type="button" class="detail-close" id="filters-close" aria-label="Close filters">&times;</button>
     </div>
     <div class="filter-panel" id="filter-panel">
-      <div class="fgroup" id="cloud-group" hidden>
-        <h2>Cloud</h2>
-        <p class="fhint">Show only the sections included in a cloud.</p>
-        <div id="cloud-filters"></div>
-      </div>
       <div class="fgroup">
-        <h2>Catalog section</h2>
-        <p class="fhint">Check a section for everything in it, or open it to pick specific products.</p>
+        <h2>Catalog</h2>
+        <p class="fhint">Check any level for everything inside it, or open it to go deeper.</p>
         <div id="tree"></div>
       </div>
       <div class="fgroup">
@@ -646,9 +644,12 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   const tint = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
   const GENERAL = "General";
   const GENERAL_LABEL = "Services for all products";
+  // "Meetings - Marketing Services" shows as "Marketing" inside its cloud, and as "Meetings" on a card.
+  const shortName = (name) => name.replace(/^[^-]+ - /, "").replace(/ Services$/, "");
+  const cardName = (name) => (name.includes(" - ") ? name.split(" - ")[0] : name.replace(/ Services$/, ""));
 
   /* ---------- Data preparation ---------- */
-  let C, SECTION, services, byId, TREE, ALL_LEAVES, TYPES, CLOUDS, CLOUD_ALWAYS;
+  let C, SECTION, services, byId, TREE, TREE_GROUPS, ALL_LEAVES, TYPES, CLOUDS, CLOUD_ALWAYS;
   const CATALOGS = (window.CATALOGS || []).filter(Boolean);
 
   function productOf(id, name) {
@@ -709,11 +710,23 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     TYPES = [...new Set(services.map((s) => s.type))].filter(Boolean);
     CLOUD_ALWAYS = (C.cloudAlways || []).filter((k) => SECTION[k]);
     CLOUDS = (C.clouds || []).map((cl) => ({ name: cl.name, sections: cl.sections.filter((k) => SECTION[k]) })).filter((cl) => cl.sections.length);
+    const node = (k) => TREE.find((t) => t.sec.key === k);
+    if (CLOUDS.length) {
+      const used = new Set();
+      TREE_GROUPS = CLOUDS.map((cl) => {
+        cl.sections.forEach((k) => used.add(k));
+        return { key: "cloud:" + cl.name, name: cl.name, sections: cl.sections.map(node).filter(Boolean) };
+      });
+      const rest = C.sections.filter((x) => !used.has(x.key)).map((x) => node(x.key)).filter(Boolean);
+      if (rest.length) TREE_GROUPS.push({ key: "cloud:other", name: "Other services", sections: rest });
+    } else {
+      TREE_GROUPS = [{ key: null, name: null, sections: TREE }];
+    }
     indexSearchFields();
   }
 
   /* ---------- State ---------- */
-  const state = { q: "", clouds: new Set(), leaves: new Set(), types: new Set(), min: "", max: "", learner: "any", sort: "catalog", page: 1, per: 24 };
+  const state = { q: "", leaves: new Set(), types: new Set(), min: "", max: "", learner: "any", sort: "catalog", page: 1, per: 24 };
   const PER_OPTIONS = [12, 24, 48, 96];
   const expanded = new Set();
   const plan = new Map();
@@ -763,21 +776,29 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   }
 
   function renderControls() {
-    $("cloud-group").hidden = !CLOUDS.length;
-    $("cloud-filters").innerHTML = CLOUDS.map((cl) => {
-      const n = services.filter((s) => cl.sections.includes(s.section)).length;
-      return `<label class="check"><input type="checkbox" data-cloud="${esc(cl.name)}"><span>${esc(cl.name)}</span><span class="count">${n}</span></label>`;
-    }).join("");
     const chev = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>`;
-    $("tree").innerHTML = TREE.map((t) => `
+    const sectionBlock = (t) => `
       <div class="tree-sec">
         <div class="tree-row">
           ${t.nested ? `<button type="button" class="twisty" data-twisty="${t.sec.key}" aria-expanded="false" aria-controls="kids-${t.sec.key}" aria-label="Show products in ${esc(t.sec.name)}">${chev}</button>` : `<span class="twisty-spacer"></span>`}
-          <label class="check"><input type="checkbox" data-sec="${t.sec.key}"><span class="dot" style="background:${t.sec.color}"></span><span>${esc(t.sec.name)}</span><span class="count">${t.count}</span></label>
+          <label class="check"><input type="checkbox" data-sec="${t.sec.key}"><span class="dot" style="background:${t.sec.color}"></span><span>${esc(shortName(t.sec.name))}</span><span class="count">${t.count}</span></label>
         </div>
         ${t.nested ? `<div class="tree-kids" id="kids-${t.sec.key}" hidden>${t.leaves.map((l) =>
           `<label class="check"><input type="checkbox" data-leaf="${esc(l.key)}"><span>${esc(l.label)}</span><span class="count">${l.count}</span></label>`).join("")}</div>` : ""}
-      </div>`).join("");
+      </div>`;
+
+    $("tree").innerHTML = TREE_GROUPS.map((g) => {
+      if (!g.name) return g.sections.map(sectionBlock).join("");
+      const count = g.sections.reduce((a, t) => a + t.count, 0);
+      const id = g.key.replace(/[^a-z0-9]+/gi, "-");
+      return `<div class="tree-group">
+        <div class="tree-row tree-row-cloud">
+          <button type="button" class="twisty" data-twisty="${esc(g.key)}" aria-expanded="false" aria-controls="kids-${id}" aria-label="Show sections in ${esc(g.name)}">${chev}</button>
+          <label class="check"><input type="checkbox" data-group="${esc(g.key)}"><span>${esc(g.name)}</span><span class="count">${count}</span></label>
+        </div>
+        <div class="tree-kids" id="kids-${id}" data-groupkids="${esc(g.key)}" hidden>${g.sections.map(sectionBlock).join("")}</div>
+      </div>`;
+    }).join("");
 
     $("types-group").hidden = !TYPES.length;
     $("types").innerHTML = TYPES.map((ty) =>
@@ -789,15 +810,26 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
 
   function syncControls() {
     $("q").value = state.q;
+    TREE_GROUPS.forEach((g) => {
+      if (!g.name) return;
+      const keys = g.sections.flatMap((t) => t.leaves.map((l) => l.key));
+      const sel = keys.filter((k) => state.leaves.has(k)).length;
+      const box = document.querySelector(`[data-group="${g.key}"]`);
+      if (!box) return;
+      box.checked = sel === keys.length; box.indeterminate = sel > 0 && sel < keys.length;
+      if (sel > 0 && sel < keys.length) expanded.add(g.key);
+      const kids = document.querySelector(`[data-groupkids="${g.key}"]`), tw = document.querySelector(`[data-twisty="${g.key}"]`);
+      if (kids) { kids.hidden = !expanded.has(g.key); tw.setAttribute("aria-expanded", expanded.has(g.key)); }
+    });
     TREE.forEach((t) => {
       const sel = t.leaves.filter((l) => state.leaves.has(l.key)).length;
       const box = document.querySelector(`[data-sec="${t.sec.key}"]`);
+      if (!box) return;
       box.checked = sel === t.leaves.length; box.indeterminate = sel > 0 && sel < t.leaves.length;
       if (sel > 0 && sel < t.leaves.length) expanded.add(t.sec.key);
       const kids = $("kids-" + t.sec.key), tw = document.querySelector(`[data-twisty="${t.sec.key}"]`);
       if (kids) { kids.hidden = !expanded.has(t.sec.key); tw.setAttribute("aria-expanded", expanded.has(t.sec.key)); }
     });
-    document.querySelectorAll("[data-cloud]").forEach((el) => { el.checked = state.clouds.has(el.dataset.cloud); });
     document.querySelectorAll("[data-leaf]").forEach((el) => { el.checked = state.leaves.has(el.dataset.leaf); });
     document.querySelectorAll("[data-type]").forEach((el) => { el.checked = state.types.has(el.dataset.type); });
     $("min").value = state.min; $("max").value = state.max;
@@ -920,12 +952,6 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     }
   }
 
-  function cloudSections() {
-    const keys = new Set(CLOUD_ALWAYS);
-    CLOUDS.forEach((cl) => { if (state.clouds.has(cl.name)) cl.sections.forEach((k) => keys.add(k)); });
-    return keys;
-  }
-
   function filtered() {
     const { strict, freeText } = parseQuery(state.q);
     const concepts = buildConcepts(freeText);
@@ -933,7 +959,6 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     const min = state.min === "" ? null : +state.min, max = state.max === "" ? null : +state.max;
     const seen = new Set();
     let list = services.filter((s) => {
-      if (state.clouds.size && !cloudSections().has(s.section)) return false;
       if (state.leaves.size && !state.leaves.has(s.leaf)) return false;
       if (state.types.size && !state.types.has(s.type)) return false;
       if (state.learner === "per" && !s.perLearner) return false;
@@ -1004,7 +1029,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     ].filter(Boolean).join(" | ");
     return `<article class="pcard${on ? " in-plan" : ""}" style="--accent:${sec.color}">
       <div class="pcard-body">
-        <div class="pcard-meta"><span class="pcard-sec"><i></i>${esc(sec.name.replace(/ Services$/, ""))}</span><span class="pcard-id">${esc(s.id)}</span></div>
+        <div class="pcard-meta"><span class="pcard-sec"><i></i>${esc(cardName(sec.name))}</span><span class="pcard-id">${esc(s.id)}</span></div>
         <h3><button type="button" class="pcard-title" data-open="${s.idx}">${esc(s.name)}</button></h3>
         <p class="pcard-type">${typeLine}</p>
         <p class="pcard-desc">${esc(s.desc)}</p>
@@ -1061,7 +1086,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       $("pager").innerHTML = ""; $("pager-info").textContent = "";
     }
     renderPills(); syncUrl();
-    const active = state.clouds.size + TREE.filter((t) => t.leaves.some((l) => state.leaves.has(l.key))).length + state.types.size +
+    const active = TREE.filter((t) => t.leaves.some((l) => state.leaves.has(l.key))).length + state.types.size +
       (state.min !== "" || state.max !== "" ? 1 : 0) + (state.learner !== "any" ? 1 : 0);
     $("filter-badge").hidden = !active; $("filter-badge").textContent = active;
     $("filters-apply").textContent = list.length ? `Show ${list.length} service${list.length === 1 ? "" : "s"}` : "No matches";
@@ -1096,12 +1121,21 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   function renderPills() {
     const pills = [];
     if (state.q) pills.push(["q", "", `Search: ${state.q}`]);
-    state.clouds.forEach((cl) => pills.push(["cloud", cl, cl]));
+    const shownSections = new Set();
+    TREE_GROUPS.forEach((g) => {
+      if (!g.name) return;
+      const keys = g.sections.flatMap((t) => t.leaves.map((l) => l.key));
+      if (keys.length && keys.every((k) => state.leaves.has(k))) {
+        pills.push(["group", g.key, g.name]);
+        g.sections.forEach((t) => shownSections.add(t.sec.key));
+      }
+    });
     TREE.forEach((t) => {
+      if (shownSections.has(t.sec.key)) return;
       const sel = t.leaves.filter((l) => state.leaves.has(l.key));
       if (!sel.length) return;
-      if (sel.length === t.leaves.length) pills.push(["sec", t.sec.key, t.sec.name]);
-      else sel.forEach((l) => pills.push(["leaf", l.key, `${t.sec.name}: ${l.label}`]));
+      if (sel.length === t.leaves.length) pills.push(["sec", t.sec.key, shortName(t.sec.name)]);
+      else sel.forEach((l) => pills.push(["leaf", l.key, `${shortName(t.sec.name)}: ${l.label}`]));
     });
     state.types.forEach((ty) => pills.push(["type", ty, ty]));
     if (state.min !== "" || state.max !== "") pills.push(["range", "", state.max === "" ? `${state.min}+ credits` : `${state.min || 0} to ${state.max} credits`]);
@@ -1152,7 +1186,6 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     const p = new URLSearchParams();
     if (state.q) p.set("q", state.q);
     if (C !== CATALOGS[0]) p.set("cat", C.meta.id);
-    if (state.clouds.size) p.set("cl", [...state.clouds].join("|"));
     if (state.leaves.size) p.set("f", [...state.leaves].join("|"));
     if (state.types.size) p.set("ty", [...state.types].join("|"));
     if (state.min !== "") p.set("min", state.min);
@@ -1167,7 +1200,6 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   function loadUrl() {
     const p = new URLSearchParams(location.search);
     state.q = p.get("q") || "";
-    (p.get("cl") || "").split("|").filter((c) => CLOUDS.some((x) => x.name === c)).forEach((c) => state.clouds.add(c));
     (p.get("f") || "").split("|").filter((k) => ALL_LEAVES.has(k)).forEach((k) => state.leaves.add(k));
     (p.get("ty") || "").split("|").filter((t) => TYPES.includes(t)).forEach((t) => state.types.add(t));
     state.min = p.get("min") || ""; state.max = p.get("max") || "";
@@ -1180,7 +1212,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
   /* ---------- Helpers ---------- */
   function resetAll() {
     Object.assign(state, { q: "", min: "", max: "", learner: "any" });
-    state.clouds.clear(); state.leaves.clear(); state.types.clear(); expanded.clear();
+    state.leaves.clear(); state.types.clear(); expanded.clear();
     syncControls(); render();
   }
   function toast(msg) { const t = $("toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toast.t); toast.t = setTimeout(() => (t.style.display = "none"), 2000); }
@@ -1200,8 +1232,12 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
 
     document.addEventListener("change", (e) => {
       const el = e.target, d = el.dataset;
-      if (d.cloud) { el.checked ? state.clouds.add(d.cloud) : state.clouds.delete(d.cloud); }
-      else if (d.sec) {
+      if (d.group) {
+        const g = TREE_GROUPS.find((x) => x.key === d.group);
+        const keys = g.sections.flatMap((t) => t.leaves.map((l) => l.key));
+        const all = keys.every((k) => state.leaves.has(k));
+        keys.forEach((k) => (all ? state.leaves.delete(k) : state.leaves.add(k)));
+      } else if (d.sec) {
         const t = TREE.find((x) => x.sec.key === d.sec);
         const all = t.leaves.every((l) => state.leaves.has(l.key));
         t.leaves.forEach((l) => (all ? state.leaves.delete(l.key) : state.leaves.add(l.key)));
@@ -1219,8 +1255,12 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       const b = e.target.closest("button"); if (!b) return;
       const d = b.dataset;
       if (d.twisty) {
-        expanded.has(d.twisty) ? expanded.delete(d.twisty) : expanded.add(d.twisty);
-        $("kids-" + d.twisty).hidden = !expanded.has(d.twisty); b.setAttribute("aria-expanded", expanded.has(d.twisty));
+        const open = !expanded.has(d.twisty);
+        open ? expanded.add(d.twisty) : expanded.delete(d.twisty);
+        const kids = d.twisty.startsWith("cloud:")
+          ? document.querySelector(`[data-groupkids="${d.twisty}"]`) : $("kids-" + d.twisty);
+        if (kids) kids.hidden = !open;
+        b.setAttribute("aria-expanded", open);
       } else if (d.catalog) {
         loadCatalog(d.catalog);
       } else if (d.page !== undefined) {
@@ -1242,9 +1282,9 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
       } else if (d.clear) {
         const v = d.value;
         if (d.clear === "q") state.q = "";
+        else if (d.clear === "group") TREE_GROUPS.find((g) => g.key === v).sections.forEach((t) => t.leaves.forEach((l) => state.leaves.delete(l.key)));
         else if (d.clear === "sec") TREE.find((t) => t.sec.key === v).leaves.forEach((l) => state.leaves.delete(l.key));
         else if (d.clear === "leaf") state.leaves.delete(v);
-        else if (d.clear === "cloud") state.clouds.delete(v);
         else if (d.clear === "type") state.types.delete(v);
         else if (d.clear === "range") { state.min = ""; state.max = ""; }
         else if (d.clear === "learner") state.learner = "any";
@@ -1299,7 +1339,7 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     buildIndex(cat);
     plan.clear(); renderPlan();
     Object.assign(state, { q: "", min: "", max: "", learner: "any", sort: "catalog", page: 1 });
-    state.clouds.clear(); state.leaves.clear(); state.types.clear(); expanded.clear();
+    state.leaves.clear(); state.types.clear(); expanded.clear();
     renderSwitcher(); renderStatic(); renderControls();
     document.querySelector("main").classList.toggle("empty-catalog", !services.length);
     if (opts.fromUrl) loadUrl();
