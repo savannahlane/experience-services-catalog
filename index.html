@@ -725,8 +725,9 @@ button.stat:focus-visible { outline: 3px solid var(--blue-dark); outline-offset:
     TREE.forEach((t) => {
       t.general = t.leaves.find((l) => l.key.endsWith("::" + GENERAL)) || null;
       t.products = t.leaves.filter((l) => l !== t.general);
-      // Product-specific rows first, product-agnostic services last.
-      t.own = t.general ? [...t.products, t.general] : t.leaves;
+      // Products A to Z, with the cross-product row last.
+      const sorted = [...t.products].sort((x, y) => x.label.localeCompare(y.label));
+      t.own = t.general ? [...sorted, t.general] : sorted;
       t.ownCount = t.own.reduce((a, l) => a + l.count, 0);
       t.nested = t.own.length > 1;
     });
